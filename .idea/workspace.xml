@@ -49,7 +49,7 @@
       <option name="presentableId" value="Default" />
       <updated>1593920928662</updated>
       <workItem from="1593920935518" duration="8000" />
-      <workItem from="1593920950881" duration="10442000" />
+      <workItem from="1593920950881" duration="14366000" />
     </task>
     <servers />
   </component>
@@ -73,10 +73,14 @@
       <screen x="0" y="23" width="1440" height="877" />
     </state>
     <state x="457" y="23" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.23.1440.877@0.23.1440.877" timestamp="1593949538841" />
-    <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1593950391542">
+    <state x="458" y="215" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1593963199146">
       <screen x="0" y="23" width="1440" height="877" />
     </state>
-    <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.23.1440.877@0.23.1440.877" timestamp="1593950391542" />
+    <state x="458" y="215" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.23.1440.877@0.23.1440.877" timestamp="1593963199146" />
+    <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1593963051804">
+      <screen x="0" y="23" width="1440" height="877" />
+    </state>
+    <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.23.1440.877@0.23.1440.877" timestamp="1593963051804" />
     <state x="436" y="194" key="NewPhpClassDialog" timestamp="1593952484627">
       <screen x="0" y="23" width="1440" height="877" />
     </state>
