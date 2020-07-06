@@ -9,18 +9,22 @@ class InitSeeder extends Seeder
     public function run()
     {
         \Illuminate\Support\Facades\DB::transaction(function () {
-            $role = \App\Model\Role::create([
-                'name'  => '超级管理员',
-                'desc'  => '',
-                'admin' => true,
+            $role = \App\Model\RoleDoctor::create([
+                'kind'                 => 1,
+                'role_is_admin'        => true,
+                'role_name'            => '超级管理员',
+                'doctor_name'          => '',
+                'doctor_desc'          => '',
+                'doctor_image'         => '',
+                'doctor_department_id' => 0,
+                'doctor_can_meet'      => false,
             ]);
             $manager = \App\Model\Manager::create([
-                'account'  => 'admin',
-                'password' => \Illuminate\Support\Facades\Hash::make('123456'),
-                'model'    => \App\Model\Role::class,
-                'model_id' => $role->id,
-                'name'     => '',
-                'status'   => true,
+                'account'        => 'admin',
+                'password'       => \Illuminate\Support\Facades\Hash::make('123456'),
+                'name'           => '',
+                'status'         => true,
+                'role_doctor_id' => $role->id
             ]);
 
             \App\Model\Permission::create([

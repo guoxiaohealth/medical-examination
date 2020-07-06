@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateMembersTable extends Migration
+class CreateMemberKindsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -15,8 +15,8 @@ class CreateMembersTable extends Migration
     {
         Schema::create('member_kinds', function (Blueprint $table) {
             $table->id();
-            $table->string('kind');
-            $table->string('desc');
+            $table->string('kind')->default('');
+            $table->string('desc')->default('');
             $table->timestamps();
         });
     }

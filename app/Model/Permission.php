@@ -5,6 +5,8 @@ namespace App\Model;
 
 class Permission extends Model
 {
+    protected $table = 'permissions';
+
     protected $fillable = [
         'name', 'desc', 'parent_id'
     ];

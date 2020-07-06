@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateRolesTable extends Migration
+class CreateRolesDoctorsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,19 +13,21 @@ class CreateRolesTable extends Migration
      */
     public function up()
     {
-        Schema::create('roles', function (Blueprint $table) {
+        Schema::create('roles_doctors', function (Blueprint $table) {
             $table->id();
-            $table->tinyInteger('kind');
-            $table->boolean('role_is_admin');
-            $table->string('role_name');
-            $table->string('doctor_desc');
-            $table->string('doctor_image');
-            $table->bigInteger('doctor_department_id');
+            $table->tinyInteger('kind')->default(0);
+            $table->boolean('role_is_admin')->default(false);
+            $table->string('role_name')->default('');
+            $table->string('doctor_name')->default('');
+            $table->string('doctor_desc')->default('');
+            $table->string('doctor_image')->default('');
+            $table->boolean('doctor_can_meet')->default(true);
+            $table->bigInteger('doctor_department_id')->default(0);
             $table->timestamps();
         });
 
-        Schema::create('role_permission', function (Blueprint $table) {
-            $table->string('role_id');
+        Schema::create('role_doctor_permission', function (Blueprint $table) {
+            $table->string('role_doctor_id');
             $table->string('permission_id');
         });
     }
@@ -37,7 +39,7 @@ class CreateRolesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('roles');
-        Schema::dropIfExists('role_permission');
+        Schema::dropIfExists('roles_doctors');
+        Schema::dropIfExists('role_doctor_permission');
     }
 }

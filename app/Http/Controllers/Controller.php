@@ -12,18 +12,18 @@ class Controller extends BaseController
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
 
-    public function data($v)
+    public function respondWithData($v)
     {
         return response()->json($v);
     }
 
-    public function success()
+    public function respondWithSuccess()
     {
         return response()->json('success');
     }
 
-    public function error($err, $status = 400)
+    public function respondWithError($error, $status = 400)
     {
-        return response()->json(['error' => $err], $status);
+        return response()->json(['error' => $error], $status);
     }
 }

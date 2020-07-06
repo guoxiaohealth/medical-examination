@@ -20,12 +20,14 @@ class Manager extends Model implements
 {
     use Authenticatable, Authorizable, CanResetPassword, MustVerifyEmail;
 
+    protected $table = 'managers';
+
     protected $fillable = [
-        'account', 'password', 'model', 'model_id', 'name', 'status'
+        'account', 'password', 'status', 'name', 'role_doctor_id',
     ];
 
     protected $hidden = [
-        'password', 'model', 'model_id'
+        'password',
     ];
 
     public function getJWTIdentifier()

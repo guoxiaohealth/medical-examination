@@ -3,7 +3,7 @@
 namespace App\Model;
 
 
-class Member extends Model
+class MemberKind extends Model
 {
     protected $fillable = [
         'kind', 'desc'

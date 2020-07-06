@@ -15,12 +15,11 @@ class CreateManagersTable extends Migration
     {
         Schema::create('managers', function (Blueprint $table) {
             $table->id();
-            $table->string('account');
-            $table->string('password');
-            $table->string('model');
-            $table->bigInteger('model_id');
-            $table->string('name');
-            $table->boolean('status');
+            $table->string('account')->default('');
+            $table->string('password')->default('');
+            $table->boolean('status')->default(true);
+            $table->string('name')->default('');
+            $table->bigInteger('role_doctor_id')->default(0);
             $table->timestamps();
         });
     }
