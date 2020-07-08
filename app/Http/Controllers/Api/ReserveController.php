@@ -10,6 +10,7 @@ use App\Model\ConfigProject;
 use App\Model\ConfigSubject;
 use App\Model\Diagnosis;
 use App\Model\MedicalPlan;
+use App\Model\Member;
 use App\Model\Subscribe;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -22,6 +23,7 @@ class ReserveController extends Controller
     {
         return $this->respondWithData(
             Subscribe::with('member', 'member.memberKind', 'member.channel', 'doctor', 'doctor.doctorDepartment')
+                ->where('doctor_id', optional(auth()->user())->role_doctor_id)
                 ->where('date', '>=', Carbon::today())->get()
         );
     }
@@ -30,6 +32,7 @@ class ReserveController extends Controller
     {
         return $this->respondWithData(
             Subscribe::with('member', 'member.memberKind', 'member.channel', 'doctor', 'doctor.doctorDepartment')
+                ->where('doctor_id', optional(auth()->user())->role_doctor_id)
                 ->where('date', '>=', Carbon::now()->startOfWeek())->get()
         );
     }
@@ -38,6 +41,7 @@ class ReserveController extends Controller
     {
         return $this->respondWithData(
             Subscribe::with('member', 'member.memberKind', 'member.channel', 'doctor', 'doctor.doctorDepartment')
+                ->where('doctor_id', optional(auth()->user())->role_doctor_id)
                 ->where('date', '>=', Carbon::now()->startOfMonth())->get()
         );
     }
@@ -52,6 +56,7 @@ class ReserveController extends Controller
         ]);
         return $this->respondWithData(
             Subscribe::with('member', 'member.memberKind', 'member.channel', 'doctor', 'doctor.doctorDepartment')
+                ->where('doctor_id', optional(auth()->user())->role_doctor_id)
                 ->when($request->input('date_s'), function (Builder $query, $value) {
                     $query->where('date', '>=', $value);
                 })->when($request->input('date_e'), function (Builder $query, $value) {
@@ -66,11 +71,36 @@ class ReserveController extends Controller
         );
     }
 
+
+    public function diagnosisCheck(Request $request)
+    {
+        $request->validate([
+            'subscribe_id' => 'required|integer|exists:subscribes,id',
+        ]);
+        return $this->respondWithData(
+            Diagnosis::with('member', 'member.memberKind', 'member.medicalPlans', 'member.channel', 'doctor')
+                ->where('subscribe_id', $request->input('subscribe_id'))
+                ->orderByDesc('id')->get()->map(function ($v) {
+                    $medicalPlans = collect(optional($v->member)->medicalPlans);
+                    //
+                    $v->medical_plan_date = optional($medicalPlans->last())->updated_at;
+                    //
+                    $v->medical_plan_merits_abnormal = $this->medicalPlanMerits(
+                        $medicalPlans->pluck('kinds.*.projects.*.subjects.*.merits')->flatten(2)->toArray()
+                    )->pluck('ex.*.status')->flatten(1)->filter(function ($v) {
+                        return $v === false;
+                    })->count();
+                    unset($v->member->medicalPlans);
+                    return $v;
+                })
+        );
+    }
+
     public function diagnosisList(Request $request)
     {
         return $this->respondWithData(
             Diagnosis::with('member', 'member.memberKind', 'member.channel', 'doctor')
-                ->orderByDesc('id')->get()
+                ->orderByDesc('id')->paginate()
         );
     }
 
@@ -79,7 +109,6 @@ class ReserveController extends Controller
         $request->validate([
             'subscribe_id' => 'required|integer|exists:subscribes,id',
             'member_id'    => 'required|integer|exists:members,id',
-            'doctor_id'    => 'required|integer|exists:roles_doctors,id',
             'conclusion'   => 'string|nullable|max:255',
             'suggest'      => 'string|nullable|max:255',
             'remarks'      => 'string|nullable|max:255',
@@ -89,10 +118,10 @@ class ReserveController extends Controller
                 'status' => 2,
             ]);
             Diagnosis::query()->updateOrCreate([
-                'member_id'    => $request->input('member_id'),
                 'subscribe_id' => $request->input('subscribe_id'),
-                'doctor_id'    => $request->input('doctor_id'),
             ], [
+                'member_id'  => $request->input('member_id'),
+                'doctor_id'  => optional(auth()->user())->role_doctor_id,
                 'times'      => Diagnosis::where('member_id', $request->input('member_id'))->count() + 1,
                 'no'         => base_convert(uniqid(), 16, 10),
                 'conclusion' => $request->input('conclusion'),
@@ -115,39 +144,30 @@ class ReserveController extends Controller
     }
 
 
-    public function medicalPlanList(Request $request)
+    public function archivesList(Request $request)
     {
-        $request->validate([
-            'member_id' => 'required|integer',
-        ]);
-        $plan        = MedicalPlan::where('member_id', $request->input('member_id'))->firstOrFail();
-        $plan->kinds = $this->medicalPlanKinds($plan->kinds);
-        return $this->respondWithData($plan);
+        $member = Member::with('memberKind', 'channel', 'diagnosis', 'medicalPlans')
+            ->whereHas('diagnosis', function (Builder $query) {
+                $query->where('doctor_id', optional(auth()->user())->role_doctor_id);
+            })->paginate();
+        $member->map(function ($v) {
+            $v->diagnosi    = $v->diagnosis->last();
+            $v->medicalPlan = $v->medicalPlans->last();
+            unset($v->diagnosis, $v->medicalPlans);
+            return $v;
+        });
+        return $this->respondWithData($member);
     }
 
-    public function medicalPlanCreate(Request $request)
+    public function patientList(Request $request)
     {
-        $request->validate([
-            'member_id'                                    => 'required|integer|exists:members,id',
-            'doctor_id'                                    => 'required|integer|exists:roles_doctors,id',
-            'kinds'                                        => 'array',
-            'kinds.*.id'                                   => 'required_with:kinds|integer|exists:config_kinds,id',
-            'kinds.*.projects'                             => 'required_with:kinds|array',
-            'kinds.*.projects.*.id'                        => 'required_with:kinds|integer|exists:config_projects,id',
-            'kinds.*.projects.*.subjects'                  => 'required_with:kinds|array',
-            'kinds.*.projects.*.subjects.*.id'             => 'required_with:kinds|integer|exists:config_subjects,id',
-            'kinds.*.projects.*.subjects.*.original'       => 'string|nullable|max:255',
-            'kinds.*.projects.*.subjects.*.date'           => 'required_with:kinds|date_format:Y-m-d',
-            'kinds.*.projects.*.subjects.*.merits'         => 'required_with:kinds|array',
-            'kinds.*.projects.*.subjects.*.merits.*.id'    => 'required_with:kinds|integer|exists:config_merits,id',
-            'kinds.*.projects.*.subjects.*.merits.*.value' => 'string|nullable|max:255',
-        ]);
-        MedicalPlan::create([
-            'member_id' => $request->input('member_id'),
-            'doctor_id' => $request->input('doctor_id'),
-            'kinds'     => $this->makeMedicalPlanKinds($request->input('kinds')),
-            'times'     => MedicalPlan::where('member_id', $request->input('member_id'))->count() + 1,
-        ]);
-        return $this->respondWithSuccess();
+        $member = Member::with('memberKind', 'channel', 'diagnosis', 'medicalPlans')->paginate();
+        $member->map(function ($v) {
+            $v->diagnosi    = $v->diagnosis->last();
+            $v->medicalPlan = $v->medicalPlans->last();
+            unset($v->diagnosis, $v->medicalPlans);
+            return $v;
+        });
+        return $this->respondWithData($member);
     }
 }

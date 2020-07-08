@@ -10,6 +10,7 @@ use App\Model\ConfigProject;
 use App\Model\ConfigSubject;
 use App\Model\Mechanism;
 use App\Model\MedicalPlan;
+use App\Model\MedicalPlanOperate;
 use App\Model\Member;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -301,23 +302,27 @@ class MedicalController extends Controller
         $request->validate([
             'search' => 'string|nullable|max:255',
         ]);
-        return $this->respondWithData(
-            Member::with('memberKind', 'channel', 'medicalPlans')
-                ->when($request->input('search'), function (Builder $query, $value) {
-                    $query->whereRaw('CONCAT(name,mobile) LIKE ?', "%{$value}%");
-                })->get()->map(function ($v) {
-                    $merits                           = collect($v->medicalPlans)
-                        ->pluck('kinds.*.projects.*.subjects.*.merits')->flatten(2);
-                    $v->medical_plans_count           = count($v->medicalPlans);
-                    $v->medical_plans_merits_count    = $merits->count();
-                    $v->medical_plans_merits_abnormal = $this->medicalPlanMerits($merits->toArray())
-                        ->pluck('ex.*.status')->flatten(1)->filter(function ($v) {
-                            return $v === false;
-                        })->count();
-                    unset($v->medicalPlans);
-                    return $v;
-                })
-        );
+        $plans = Member::with('memberKind', 'channel', 'medicalPlans')
+            ->when($request->input('search'), function (Builder $query, $value) {
+                $query->whereRaw('CONCAT(name,mobile) LIKE ?', "%{$value}%");
+            })->paginate();
+        $plans->map(function ($v) {
+            $medicalPlans = collect($v->medicalPlans);
+            // 体检次数
+            $v->medical_plans_count = $medicalPlans->count();
+            // 报告份数
+            $v->medical_plans_merits_count = $medicalPlans->pluck('kinds.*.projects.*.subjects.*.merits')
+                ->flatten(1)->count();
+            // 异常数
+            $v->medical_plans_merits_abnormal = $this->medicalPlanMerits(
+                $medicalPlans->pluck('kinds.*.projects.*.subjects.*.merits')->flatten(2)->toArray()
+            )->pluck('ex.*.status')->flatten(1)->filter(function ($v) {
+                return $v === false;
+            })->count();
+            unset($v->medicalPlans);
+            return $v;
+        });
+        return $this->respondWithData($plans);
     }
 
     public function medicalPlanCheck(Request $request)
@@ -325,10 +330,10 @@ class MedicalController extends Controller
         $request->validate([
             'member_id' => 'required|integer|exists:members,id',
         ]);
-
-        $plan = MedicalPlan::where('member_id', $request->input('member_id'))
+        // 最新体检
+        $plan = MedicalPlan::with('doctor')->where('member_id', $request->input('member_id'))
             ->orderByDesc('id')->firstOrFail();
-
+        //
         $plan->kinds = $this->medicalPlanKinds($plan->kinds);
         return $this->respondWithData($plan);
     }
@@ -337,7 +342,6 @@ class MedicalController extends Controller
     {
         $request->validate([
             'member_id'                                    => 'required|integer|exists:members,id',
-            'doctor_id'                                    => 'required|integer|exists:roles_doctors,id',
             'kinds'                                        => 'array',
             'kinds.*.id'                                   => 'required_with:kinds|integer|exists:config_kinds,id',
             'kinds.*.projects'                             => 'required_with:kinds|array',
@@ -350,12 +354,19 @@ class MedicalController extends Controller
             'kinds.*.projects.*.subjects.*.merits.*.id'    => 'required_with:kinds|integer|exists:config_merits,id',
             'kinds.*.projects.*.subjects.*.merits.*.value' => 'string|nullable|max:255',
         ]);
-        MedicalPlan::create([
-            'member_id' => $request->input('member_id'),
-            'doctor_id' => $request->input('doctor_id'),
-            'kinds'     => $this->makeMedicalPlanKinds($request->input('kinds')),
-            'times'     => MedicalPlan::where('member_id', $request->input('member_id'))->count() + 1,
-        ]);
+        DB::transaction(function () use ($request) {
+            $medicalPlan = MedicalPlan::create([
+                'member_id' => $request->input('member_id'),
+                'doctor_id' => optional(auth()->user())->role_doctor_id,
+                'kinds'     => $this->makeMedicalPlanKinds($request->input('kinds')),
+                'times'     => MedicalPlan::where('member_id', $request->input('member_id'))->count() + 1,
+            ]);
+            MedicalPlanOperate::create([
+                'role_doctor_id'  => optional(auth()->user())->role_doctor_id,
+                'medical_plan_id' => $medicalPlan->id,
+                'operate'         => 1
+            ]);
+        });
         return $this->respondWithSuccess();
     }
 
@@ -374,15 +385,70 @@ class MedicalController extends Controller
             'kinds.*.projects.*.subjects.*.merits.*.id'    => 'required|integer|exists:config_merits,id',
             'kinds.*.projects.*.subjects.*.merits.*.value' => 'required|string',
         ]);
-        $medicalPlan->update([
-            'kinds' => $this->makeMedicalPlanKinds($request->input('kinds')),
-        ]);
+        DB::transaction(function () use ($request, $medicalPlan) {
+            $medicalPlan->update([
+                'kinds' => $this->makeMedicalPlanKinds($request->input('kinds')),
+            ]);
+            MedicalPlanOperate::create([
+                'role_doctor_id'  => optional(auth()->user())->role_doctor_id,
+                'medical_plan_id' => $medicalPlan->id,
+                'operate'         => 2
+            ]);
+        });
         return $this->respondWithSuccess();
     }
 
     public function medicalPlanDelete(Request $request, MedicalPlan $medicalPlan)
     {
-        $medicalPlan->delete();
+        DB::transaction(function () use ($request, $medicalPlan) {
+            $medicalPlan->delete();
+            MedicalPlanOperate::create([
+                'role_doctor_id'  => optional(auth()->user())->role_doctor_id,
+                'medical_plan_id' => $medicalPlan->id,
+                'operate'         => 3
+            ]);
+        });
         return $this->respondWithSuccess();
+    }
+
+    public function optionList(Request $request)
+    {
+        $request->validate([
+            'search' => 'string|nullable|max:255',
+        ]);
+        $plans = Member::with('memberKind', 'channel', 'medicalPlans', 'medicalPlans.doctor')
+            ->when($request->input('search'), function (Builder $query, $value) {
+                $query->whereRaw('CONCAT(name,mobile) LIKE ?', "%{$value}%");
+            })->paginate();
+        $plans->map(function ($v) {
+            $medicalPlans = collect($v->medicalPlans);
+            // 体检次数
+            $v->medical_plans_count = $medicalPlans->count();
+            // 最后体检备注
+            $v->medical_plans_latest_doctor = optional($medicalPlans->last())->doctor;
+            $v->medical_plans_latest_date   = optional($medicalPlans->last())->updated_at;
+            unset($v->medicalPlans);
+            return $v;
+        });
+        return $this->respondWithData($plans);
+    }
+
+    public function memberOptionList(Request $request)
+    {
+        $request->validate([
+            'member_id' => 'required|integer|exists:members,id',
+        ]);
+        return $this->respondWithData(
+            MedicalPlan::with('doctor')->where('member_id', $request->input('member_id'))
+                ->get()->map(function ($v) {
+                    $kinds                     = collect($v->kinds);
+                    $v->medical_plans_kinds    = $kinds->count();
+                    $v->medical_plans_projects = $kinds->pluck('projects')->flatten(1)->count();
+                    $v->medical_plans_subjects = $kinds->pluck('projects.*.subjects')->flatten(2)->count();
+                    $v->medical_plans          = $this->medicalPlanKinds($v->kinds);
+                    unset($v->kinds);
+                    return $v;
+                })
+        );
     }
 }

@@ -30,20 +30,25 @@ Route::namespace('Api')->group(function (Router $router) {
             $router->get('total', 'ReserveController@subscribeTotalList');
         });
         $router->group(['prefix' => 'diagnosis'], function (Router $router) {
+            $router->get('check', 'ReserveController@diagnosisCheck');
             $router->get('list', 'ReserveController@diagnosisList');
             $router->post('create', 'ReserveController@diagnosisCreate');
             $router->post('finish', 'ReserveController@diagnosisFinish');
+        });
+        $router->group(['prefix' => 'plan'], function (Router $router) {
+            $router->get('check', 'MedicalController@medicalPlanCheck');
+            $router->post('create', 'MedicalController@medicalPlanCreate');
         });
         $router->group(['prefix' => 'medical'], function (Router $router) {
             $router->get('list', 'ReserveController@medicalPlanList');
             $router->post('create', 'ReserveController@medicalPlanCreate');
         });
         $router->group(['prefix' => 'archives'], function (Router $router) {
-
+            $router->get('list', 'ReserveController@archivesList');
+            $router->get('options', 'MedicalController@memberOptionList');
+            $router->get('check', 'ReserveController@diagnosisCheck');
         });
-        $router->group(['prefix' => 'patient'], function (Router $router) {
-
-        });
+        $router->get('patient', 'ReserveController@patientList');
     });
     $router->group(['prefix' => 'subscribe'], function (Router $router) {
         $router->get('today', 'SubscribeController@reserveTodayList');
@@ -56,15 +61,17 @@ Route::namespace('Api')->group(function (Router $router) {
         $router->group(['prefix' => 'plan'], function (Router $router) {
             $router->get('list', 'MedicalController@medicalPlanList');
             $router->get('check', 'MedicalController@medicalPlanCheck');
-            $router->post('check', 'MedicalController@medicalPlanCreate');
+            $router->post('create', 'MedicalController@medicalPlanCreate');
             $router->put('update/{medical_plan}', 'MedicalController@medicalPlanUpdate');
             $router->delete('delete/{medical_plan}', 'MedicalController@medicalPlanDelete');
         });
         $router->group(['prefix' => 'abnormal'], function (Router $router) {
-            $router->get('list', 'MedicalController@abnormalList');
+            $router->get('list', 'MedicalController@medicalPlanList');
+            $router->get('check', 'MedicalController@medicalPlanCheck');
         });
         $router->group(['prefix' => 'option'], function (Router $router) {
-
+            $router->get('list', 'MedicalController@optionList');
+            $router->get('member', 'MedicalController@memberOptionList');
         });
         $router->group(['prefix' => 'config'], function (Router $router) {
             $router->get('list', 'MedicalController@configList');
@@ -102,17 +109,13 @@ Route::namespace('Api')->group(function (Router $router) {
         });
     });
     $router->group(['prefix' => 'visit'], function (Router $router) {
-        $router->group(['prefix' => 'mine'], function (Router $router) {
-
-        });
-        $router->group(['prefix' => 'total'], function (Router $router) {
-
-        });
-        $router->group(['prefix' => 'plan'], function (Router $router) {
-
-        });
+        $router->get('mine', 'VisitController@planMine');
+        $router->get('list', 'VisitController@planList');
+        $router->get('total', 'VisitController@planTotal');
+        $router->post('check/{visit_details}', 'VisitController@planCheck');
+        $router->post('create', 'VisitController@planCreate');
+        $router->get('records', 'VisitController@planRecords');
     });
-
 
     $router->group(['prefix' => 'member'], function (Router $router) {
         $router->get('list', 'MemberController@memberList');

@@ -3,11 +3,11 @@
   <component name="ChangeListManager">
     <list default="true" id="7cb8db60-313a-4ee6-bd02-0033d254faaf" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Api/SystemController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Api/SystemController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Controller.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Controller.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Model/MemberKind.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Model/MemberKind.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Model/RoleDoctor.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Model/RoleDoctor.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/composer.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Api/MedicalController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Api/MedicalController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Api/ReserveController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Api/ReserveController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Api/VisitController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Api/VisitController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Model/Member.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Model/Member.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2020_07_05_123139_create_roles_doctors_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2020_07_05_123139_create_roles_doctors_table.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/api.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -145,15 +145,16 @@
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/app/Model" />
-      <recent name="$PROJECT_DIR$/app/Model" />
-      <recent name="$PROJECT_DIR$/app/Http/Controllers/Api" />
-    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/app/Http/Controllers/Api" />
       <recent name="$PROJECT_DIR$/app/Http/Controllers/Api" />
       <recent name="$PROJECT_DIR$/app/Model" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/app/Model" />
+      <recent name="$PROJECT_DIR$/app/Model" />
+      <recent name="$PROJECT_DIR$/app/Model" />
+      <recent name="$PROJECT_DIR$/app/Http/Controllers/Api" />
     </key>
   </component>
   <component name="RunManager">
@@ -175,7 +176,8 @@
       <workItem from="1593920935518" duration="8000" />
       <workItem from="1593920950881" duration="14366000" />
       <workItem from="1593999899283" duration="6951000" />
-      <workItem from="1594008626801" duration="54252000" />
+      <workItem from="1594008626801" duration="54370000" />
+      <workItem from="1594192817896" duration="10239000" />
     </task>
     <servers />
   </component>

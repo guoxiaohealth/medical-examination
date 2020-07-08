@@ -37,4 +37,14 @@ class Member extends Model
     {
         return $this->hasMany(MedicalPlan::class, 'member_id', 'id');
     }
+
+    public function diagnosis()
+    {
+        return $this->hasMany(Diagnosis::class, 'member_id', 'id');
+    }
+
+    public function visit()
+    {
+        return $this->hasOne(Visit::class, 'member_id', 'id');
+    }
 }

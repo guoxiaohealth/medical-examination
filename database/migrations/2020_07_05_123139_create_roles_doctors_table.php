@@ -27,8 +27,8 @@ class CreateRolesDoctorsTable extends Migration
         });
 
         Schema::create('role_doctor_permission', function (Blueprint $table) {
-            $table->string('role_doctor_id');
-            $table->string('permission_id');
+            $table->bigInteger('role_doctor_id')->default(0);
+            $table->bigInteger('permission_id')->default(0);
         });
     }
 
