@@ -18,7 +18,7 @@ class SystemController extends Controller
     public function memberKindList(Request $request)
     {
         return $this->respondWithData(
-            MemberKind::query()->get()
+            MemberKind::get()
         );
     }
 
@@ -42,7 +42,7 @@ class SystemController extends Controller
             'desc' => 'max:255',
         ]);
         $data = $request->only(['kind', 'desc']);
-        $memberKind->update($data);
+        $memberKind->update(array_filter($data));
         return $this->respondWithSuccess();
 
     }
@@ -78,7 +78,7 @@ class SystemController extends Controller
             'name' => 'string|nullable|max:255',
         ]);
         $data = $request->only(['name']);
-        $channel->update($data);
+        $channel->update(array_filter($data));
         return $this->respondWithSuccess();
     }
 
@@ -113,7 +113,7 @@ class SystemController extends Controller
             'name' => 'string|nullable|max:255',
         ]);
         $data = $request->only(['name']);
-        $department->update($data);
+        $department->update(array_filter($data));
         return $this->respondWithSuccess();
 
     }
@@ -124,26 +124,13 @@ class SystemController extends Controller
         return $this->respondWithSuccess();
     }
 
-    const roleKind = 1;
+    const roleKind   = 1;
     const doctorKind = 2;
 
     public function doctorList(Request $request)
     {
         return $this->respondWithData(
-            RoleDoctor::where('kind', self::doctorKind)->get()->map(function ($v) {
-                return [
-                    'id'          => $v->id,
-                    'name'        => $v->doctor_name,
-                    'desc'        => $v->doctor_desc,
-                    'image'       => $v->doctor_image,
-                    'department'  => $v->doctor_department,
-                    'can_meet'    => $v->doctor_can_meet,
-                    'manager'     => Manager::where('role_doctor_id', $v->id)->first(),
-                    'permissions' => $v->permissions,
-                    'created_at'  => $v->created_at,
-                    'updated_at'  => $v->updated_at,
-                ];
-            })
+            RoleDoctor::with('managers', 'doctorDepartment')->where('kind', self::doctorKind)->get()
         );
     }
 
@@ -151,7 +138,7 @@ class SystemController extends Controller
     {
         $request->validate([
             'name'          => 'required|max:255',
-            'department_id' => 'required|integer',
+            'department_id' => 'required|integer|exists:departments,id',
             'image'         => 'string|nullable|max:255',
             'desc'          => 'string|nullable|max:255',
         ]);
@@ -160,8 +147,8 @@ class SystemController extends Controller
             'role_is_admin'        => false,
             'role_name'            => '',
             'doctor_name'          => $request->input('name'),
-            'doctor_desc'          => $request->input('desc', ''),
-            'doctor_image'         => $request->input('image', ''),
+            'doctor_desc'          => strval($request->input('desc')),
+            'doctor_image'         => strval($request->input('image')),
             'doctor_department_id' => $request->input('department_id'),
             'doctor_can_meet'      => true,
         ]);
@@ -171,11 +158,11 @@ class SystemController extends Controller
     public function doctorUpdate(Request $request, RoleDoctor $doctor)
     {
         if ($doctor->kind != self::doctorKind) {
-            return $this->respondWithError('not found doctor');
+            throw new \Exception('not found doctor');
         }
         $request->validate([
             'name'          => 'string|nullable|max:255',
-            'department_id' => 'integer',
+            'department_id' => 'integer|exists:departments,id',
             'image'         => 'string|nullable|max:255',
             'desc'          => 'string|nullable|max:255',
             'status'        => 'boolean',
@@ -204,7 +191,7 @@ class SystemController extends Controller
     public function doctorDelete(Request $request, RoleDoctor $doctor)
     {
         if ($doctor->kind != self::doctorKind) {
-            return $this->respondWithError('not found doctor');
+            throw new \Exception('not found doctor');
         }
         $doctor->delete();
         return $this->respondWithSuccess();
@@ -213,14 +200,14 @@ class SystemController extends Controller
     public function doctorManager(Request $request, RoleDoctor $doctor)
     {
         if ($doctor->kind != self::doctorKind) {
-            return $this->respondWithError('not found doctor');
+            throw new \Exception('not found doctor');
         }
         $request->validate([
             'account'       => 'string|nullable|max:255',
             'password'      => 'string|nullable|integer',
             'status'        => 'boolean',
             'permissions'   => 'array',
-            'permissions.*' => 'integer',
+            'permissions.*' => 'integer|exists:permissions,id',
         ]);
         DB::transaction(function () use ($request, $doctor) {
             $data = [];
@@ -233,7 +220,7 @@ class SystemController extends Controller
             if ($request->has('status')) {
                 $data['status'] = $request->input('status');
             }
-            Manager::query()->updateOrCreate([
+            Manager::updateOrCreate([
                 'role_doctor_id' => $doctor->id,
             ], $data);
             $doctor->permissions()->sync($request->input('permissions', []));
@@ -245,17 +232,7 @@ class SystemController extends Controller
     public function roleList(Request $request)
     {
         return $this->respondWithData(
-            RoleDoctor::where('kind', self::roleKind)->get()->map(function ($v) {
-                return [
-                    'id'          => $v->id,
-                    'name'        => $v->role_name,
-                    'is_admin'    => $v->role_is_admin,
-                    'manager'     => Manager::where('role_doctor_id', $v->id)->get(),
-                    'permissions' => $v->permissions,
-                    'created_at'  => $v->created_at,
-                    'updated_at'  => $v->updated_at,
-                ];
-            })
+            RoleDoctor::with('managers')->where('kind', self::roleKind)->get()
         );
     }
 
@@ -264,7 +241,7 @@ class SystemController extends Controller
         $request->validate([
             'name'          => 'required|max:255',
             'permissions'   => 'array',
-            'permissions.*' => 'integer',
+            'permissions.*' => 'integer|exists:permissions,id',
         ]);
         DB::transaction(function () use ($request) {
             RoleDoctor::create([
@@ -284,12 +261,12 @@ class SystemController extends Controller
     public function roleUpdate(Request $request, RoleDoctor $role)
     {
         if ($role->kind != self::roleKind) {
-            return $this->respondWithError('not found role');
+            throw new \Exception('not found role');
         }
         $request->validate([
             'name'          => 'string|nullable|max:255',
             'permissions'   => 'array',
-            'permissions.*' => 'integer',
+            'permissions.*' => 'integer|exists:permissions,id',
         ]);
         DB::transaction(function () use ($request, $role) {
             $data = [];
@@ -310,7 +287,7 @@ class SystemController extends Controller
     public function roleDelete(Request $request, RoleDoctor $role)
     {
         if ($role->kind != self::roleKind) {
-            return $this->respondWithError('not found role');
+            throw new \Exception('not found role');
         }
         $role->delete();
         return $this->respondWithSuccess();
@@ -319,7 +296,7 @@ class SystemController extends Controller
     public function roleManagerCreate(Request $request, RoleDoctor $role)
     {
         if ($role->kind != self::roleKind) {
-            return $this->respondWithError('not found role');
+            throw new \Exception('not found role');
         }
         $request->validate([
             'account'  => 'required|max:255',
@@ -344,7 +321,7 @@ class SystemController extends Controller
             're_password' => 'required|max:255',
         ]);
         if (!Hash::check($request->input('re_password'), $manager->password)) {
-            return $this->respondWithError('password invalid');
+            throw new \Exception('password invalid');
         }
         $manager->update([
             'account'  => $request->input('account'),
