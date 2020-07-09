@@ -2,27 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7cb8db60-313a-4ee6-bd02-0033d254faaf" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/medical-examination.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/medical-examination.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Api/AuthController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Api/AuthController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Api/MedicalController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Api/MedicalController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Api/MemberController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Api/MemberController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Api/ReserveController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Api/ReserveController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Api/SubscribeController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Api/SubscribeController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Api/SystemController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Api/SystemController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Api/VisitController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Api/VisitController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Controller.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Controller.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Model/Manager.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Model/Manager.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Model/MedicalPlanOperate.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Model/MedicalPlanOperate.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Model/RoleDoctor.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Model/RoleDoctor.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Model/Visit.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Model/Visit.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Model/VisitDetails.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Model/VisitDetails.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/composer.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/migrations/2020_07_05_114852_create_managers_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2020_07_05_114852_create_managers_table.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/http.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/api.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -192,7 +173,7 @@
       <workItem from="1593920950881" duration="14366000" />
       <workItem from="1593999899283" duration="6951000" />
       <workItem from="1594008626801" duration="54370000" />
-      <workItem from="1594192817896" duration="34167000" />
+      <workItem from="1594192817896" duration="35032000" />
     </task>
     <servers />
   </component>

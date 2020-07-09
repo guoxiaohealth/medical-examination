@@ -12,6 +12,7 @@ use App\Model\RoleDoctor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class SystemController extends Controller
 {
@@ -476,6 +477,25 @@ class SystemController extends Controller
     {
         return $this->respondWithData(
             Permission::with('children')->where('parent_id', 0)->get()
+        );
+    }
+
+
+    public function upload(Request $request)
+    {
+        $request->validate([
+            'file' => 'required',
+        ]);
+        $file = $request->file('file');
+        if (!$file->isValid()) {
+            throw new \Exception('file is invalid');
+        }
+        $file     = $request->file('file');
+        $filename = sprintf("%s.%s", uniqid('file-'), $file->getClientOriginalExtension());
+        Storage::disk('public')->put($filename, file_get_contents($file->getRealPath()));
+
+        return $this->respondWithData(
+            Storage::disk('public')->url($filename)
         );
     }
 }

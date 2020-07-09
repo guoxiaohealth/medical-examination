@@ -23,7 +23,7 @@ Route::namespace('Api')->group(function (Router $router) {
         $router->get('refresh', 'AuthController@refresh');
         $router->get('me', 'AuthController@me');
     });
-    $router->group(['prefix' => 'reserve'], function (Router $router) {
+    $router->group(['prefix' => 'reserve', 'middleware' => 'auth:api'], function (Router $router) {
         $router->group(['prefix' => 'subscribe'], function (Router $router) {
             $router->get('today', 'ReserveController@subscribeTodayList');
             $router->get('week', 'ReserveController@subscribeWeekList');
@@ -39,14 +39,14 @@ Route::namespace('Api')->group(function (Router $router) {
             $router->get('history', 'ReserveController@diagnosisHistory');
         });
     });
-    $router->group(['prefix' => 'subscribe'], function (Router $router) {
+    $router->group(['prefix' => 'subscribe', 'middleware' => 'auth:api'], function (Router $router) {
         $router->get('today', 'SubscribeController@reserveTodayList');
         $router->get('list', 'SubscribeController@reserveList');
         $router->post('create', 'SubscribeController@reserveCreate');
         $router->put('update/{subscribe}', 'SubscribeController@reserveUpdate');
         $router->delete('delete/{subscribe}', 'SubscribeController@reserveDelete');
     });
-    $router->group(['prefix' => 'medical'], function (Router $router) {
+    $router->group(['prefix' => 'medical', 'middleware' => 'auth:api'], function (Router $router) {
         $router->group(['prefix' => 'plan'], function (Router $router) {
             $router->get('list', 'MedicalController@medicalPlanList');
             $router->get('check', 'MedicalController@medicalPlanCheck');
@@ -94,7 +94,7 @@ Route::namespace('Api')->group(function (Router $router) {
             $router->delete('delete/{mechanism}', 'MedicalController@mechanismDelete');
         });
     });
-    $router->group(['prefix' => 'visit'], function (Router $router) {
+    $router->group(['prefix' => 'visit', 'middleware' => 'auth:api'], function (Router $router) {
         $router->get('mine', 'VisitController@visitDetailsMine');
         $router->get('total', 'VisitController@visitDetailsTotal');
         $router->get('plans', 'VisitController@planList');
@@ -102,7 +102,7 @@ Route::namespace('Api')->group(function (Router $router) {
         $router->get('member', 'VisitController@visitDetailsList');
         $router->post('check/{visit}', 'VisitController@planCheck');
     });
-    $router->group(['prefix' => 'member'], function (Router $router) {
+    $router->group(['prefix' => 'member', 'middleware' => 'auth:api'], function (Router $router) {
         $router->get('list', 'MemberController@memberList');
         $router->post('create', 'MemberController@memberCreate');
         $router->put('update/{member}', 'MemberController@memberUpdate');
@@ -147,6 +147,7 @@ Route::namespace('Api')->group(function (Router $router) {
         $router->group(['prefix' => 'permission'], function (Router $router) {
             $router->get('list', 'SystemController@permissionList');
         });
+        $router->post('upload', 'SystemController@upload');
     });
 });
 
