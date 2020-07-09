@@ -39,4 +39,9 @@ class Manager extends Model implements
     {
         return [];
     }
+
+    public function roleDoctor()
+    {
+        return $this->hasOne(RoleDoctor::class, 'id', 'role_doctor_id');
+    }
 }

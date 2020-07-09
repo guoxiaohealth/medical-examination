@@ -18,6 +18,10 @@ use Illuminate\Support\Facades\DB;
 
 class MedicalController extends Controller
 {
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function mechanismList(Request $request)
     {
         return $this->respondWithData(
@@ -25,6 +29,10 @@ class MedicalController extends Controller
         );
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function mechanismCreate(Request $request)
     {
         $request->validate([
@@ -40,6 +48,11 @@ class MedicalController extends Controller
         return $this->respondWithSuccess();
     }
 
+    /**
+     * @param Request $request
+     * @param Mechanism $mechanism
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function mechanismUpdate(Request $request, Mechanism $mechanism)
     {
         $request->validate([
@@ -52,6 +65,12 @@ class MedicalController extends Controller
         return $this->respondWithSuccess();
     }
 
+    /**
+     * @param Request $request
+     * @param Mechanism $mechanism
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
     public function mechanismDelete(Request $request, Mechanism $mechanism)
     {
         $mechanism->delete();
@@ -59,6 +78,10 @@ class MedicalController extends Controller
     }
 
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function configList(Request $request)
     {
         $request->validate([
@@ -70,6 +93,11 @@ class MedicalController extends Controller
         );
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
     public function configCopy(Request $request)
     {
         $request->validate([
@@ -83,23 +111,27 @@ class MedicalController extends Controller
         }
         DB::transaction(function () use ($request, $mechanismA, $mechanismB) {
             ConfigKind::where('mechanism_id', $mechanismA)->get()->map(function ($v) use ($request, $mechanismB) {
+                ConfigKind::where('mechanism_id', $mechanismB)->delete();
                 $configKind = ConfigKind::create([
                     'mechanism_id' => $mechanismB,
                     'name'         => $v->name,
                 ]);
                 $v->projects->map(function ($v) use ($configKind, $mechanismB) {
+                    ConfigProject::where('mechanism_id', $mechanismB)->delete();
                     $configProject = ConfigProject::create([
                         'mechanism_id'   => $mechanismB,
                         'config_kind_id' => $configKind->id,
                         'name'           => $v->name,
                     ]);
                     $v->subjects->map(function ($v) use ($configProject, $mechanismB) {
+                        ConfigSubject::where('mechanism_id', $mechanismB)->delete();
                         $configSubject = ConfigSubject::create([
                             'mechanism_id'      => $mechanismB,
                             'config_project_id' => $configProject->id,
                             'name'              => $v->name,
                         ]);
                         $v->merits->map(function ($v) use ($configSubject, $mechanismB) {
+                            ConfigMerit::where('mechanism_id', $mechanismB)->delete();
                             ConfigMerit::create([
                                 'mechanism_id'      => $mechanismB,
                                 'config_subject_id' => $configSubject->id,
@@ -118,13 +150,24 @@ class MedicalController extends Controller
     }
 
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function configKindList(Request $request)
     {
+        $request->validate([
+            'mechanism_id' => 'required|integer',
+        ]);
         return $this->respondWithData(
-            ConfigKind::get()
+            ConfigKind::where('mechanism_id', $request->input('mechanism_id'))->get()
         );
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function configKindCreate(Request $request)
     {
         $request->validate([
@@ -138,6 +181,11 @@ class MedicalController extends Controller
         return $this->respondWithSuccess();
     }
 
+    /**
+     * @param Request $request
+     * @param ConfigKind $configKind
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function configKindUpdate(Request $request, ConfigKind $configKind)
     {
         $request->validate([
@@ -148,20 +196,36 @@ class MedicalController extends Controller
         return $this->respondWithSuccess();
     }
 
+    /**
+     * @param Request $request
+     * @param ConfigKind $configKind
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
     public function configKindDelete(Request $request, ConfigKind $configKind)
     {
         $configKind->delete();
         return $this->respondWithSuccess();
     }
 
-
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function configProjectList(Request $request)
     {
+        $request->validate([
+            'mechanism_id' => 'required|integer',
+        ]);
         return $this->respondWithData(
-            ConfigProject::get()
+            ConfigProject::where('mechanism_id', $request->input('mechanism_id'))->get()
         );
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function configProjectCreate(Request $request)
     {
         $request->validate([
@@ -177,6 +241,11 @@ class MedicalController extends Controller
         return $this->respondWithSuccess();
     }
 
+    /**
+     * @param Request $request
+     * @param ConfigProject $configProject
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function configProjectUpdate(Request $request, ConfigProject $configProject)
     {
         $request->validate([
@@ -187,6 +256,12 @@ class MedicalController extends Controller
         return $this->respondWithSuccess();
     }
 
+    /**
+     * @param Request $request
+     * @param ConfigProject $configProject
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
     public function configProjectDelete(Request $request, ConfigProject $configProject)
     {
         $configProject->delete();
@@ -194,13 +269,24 @@ class MedicalController extends Controller
     }
 
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function configSubjectList(Request $request)
     {
+        $request->validate([
+            'mechanism_id' => 'required|integer',
+        ]);
         return $this->respondWithData(
-            ConfigSubject::get()
+            ConfigSubject::where('mechanism_id', $request->input('mechanism_id'))->get()
         );
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function configSubjectCreate(Request $request)
     {
         $request->validate([
@@ -208,7 +294,7 @@ class MedicalController extends Controller
             'config_project_id' => 'required|integer|exists:config_projects,id',
             'name'              => 'required|max:255',
         ]);
-        ConfigProject::create([
+        ConfigSubject::create([
             'mechanism_id'      => $request->input('mechanism_id'),
             'config_project_id' => $request->input('config_project_id'),
             'name'              => $request->input('name'),
@@ -216,6 +302,11 @@ class MedicalController extends Controller
         return $this->respondWithSuccess();
     }
 
+    /**
+     * @param Request $request
+     * @param ConfigSubject $configSubject
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function configSubjectUpdate(Request $request, ConfigSubject $configSubject)
     {
         $request->validate([
@@ -226,6 +317,12 @@ class MedicalController extends Controller
         return $this->respondWithSuccess();
     }
 
+    /**
+     * @param Request $request
+     * @param ConfigSubject $configSubject
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
     public function configSubjectDelete(Request $request, ConfigSubject $configSubject)
     {
         $configSubject->delete();
@@ -233,13 +330,24 @@ class MedicalController extends Controller
     }
 
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function configMeritList(Request $request)
     {
+        $request->validate([
+            'mechanism_id' => 'required|integer',
+        ]);
         return $this->respondWithData(
-            ConfigMerit::get()
+            ConfigMerit::where('mechanism_id', $request->input('mechanism_id'))->get()
         );
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function configMeritCreate(Request $request)
     {
         $request->validate([
@@ -269,6 +377,11 @@ class MedicalController extends Controller
         return $this->respondWithSuccess();
     }
 
+    /**
+     * @param Request $request
+     * @param ConfigMerit $configMerit
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function configMeritUpdate(Request $request, ConfigMerit $configMerit)
     {
         $request->validate([
@@ -290,6 +403,12 @@ class MedicalController extends Controller
         return $this->respondWithSuccess();
     }
 
+    /**
+     * @param Request $request
+     * @param ConfigMerit $configMerit
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
     public function configMeritDelete(Request $request, ConfigMerit $configMerit)
     {
         $configMerit->delete();
@@ -297,6 +416,10 @@ class MedicalController extends Controller
     }
 
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function medicalPlanList(Request $request)
     {
         $request->validate([
@@ -325,19 +448,31 @@ class MedicalController extends Controller
         return $this->respondWithData($plans);
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function medicalPlanCheck(Request $request)
     {
         $request->validate([
             'member_id' => 'required|integer|exists:members,id',
+            'times'     => 'integer',
         ]);
         // 最新体检
-        $plan = MedicalPlan::with('doctor')->where('member_id', $request->input('member_id'))
-            ->orderByDesc('id')->firstOrFail();
+        $plan = MedicalPlan::with('doctor')
+            ->where('member_id', $request->input('member_id'))
+            ->when($request->input('times'), function (Builder $query, $value) {
+                $query->where('times', $value);
+            })->orderByDesc('id')->firstOrFail();
         //
         $plan->kinds = $this->medicalPlanKinds($plan->kinds);
         return $this->respondWithData($plan);
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function medicalPlanCreate(Request $request)
     {
         $request->validate([
@@ -357,12 +492,12 @@ class MedicalController extends Controller
         DB::transaction(function () use ($request) {
             $medicalPlan = MedicalPlan::create([
                 'member_id' => $request->input('member_id'),
-                'doctor_id' => optional(auth()->user())->role_doctor_id,
+                'doctor_id' => $this->user()->role_doctor_id,
                 'kinds'     => $this->makeMedicalPlanKinds($request->input('kinds')),
                 'times'     => MedicalPlan::where('member_id', $request->input('member_id'))->count() + 1,
             ]);
             MedicalPlanOperate::create([
-                'role_doctor_id'  => optional(auth()->user())->role_doctor_id,
+                'role_doctor_id'  => $this->user()->role_doctor_id,
                 'medical_plan_id' => $medicalPlan->id,
                 'operate'         => 1
             ]);
@@ -370,6 +505,11 @@ class MedicalController extends Controller
         return $this->respondWithSuccess();
     }
 
+    /**
+     * @param Request $request
+     * @param MedicalPlan $medicalPlan
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function medicalPlanUpdate(Request $request, MedicalPlan $medicalPlan)
     {
         $request->validate([
@@ -390,7 +530,7 @@ class MedicalController extends Controller
                 'kinds' => $this->makeMedicalPlanKinds($request->input('kinds')),
             ]);
             MedicalPlanOperate::create([
-                'role_doctor_id'  => optional(auth()->user())->role_doctor_id,
+                'role_doctor_id'  => $this->user()->role_doctor_id,
                 'medical_plan_id' => $medicalPlan->id,
                 'operate'         => 2
             ]);
@@ -398,12 +538,17 @@ class MedicalController extends Controller
         return $this->respondWithSuccess();
     }
 
+    /**
+     * @param Request $request
+     * @param MedicalPlan $medicalPlan
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function medicalPlanDelete(Request $request, MedicalPlan $medicalPlan)
     {
         DB::transaction(function () use ($request, $medicalPlan) {
             $medicalPlan->delete();
             MedicalPlanOperate::create([
-                'role_doctor_id'  => optional(auth()->user())->role_doctor_id,
+                'role_doctor_id'  => $this->user()->role_doctor_id,
                 'medical_plan_id' => $medicalPlan->id,
                 'operate'         => 3
             ]);
@@ -411,6 +556,25 @@ class MedicalController extends Controller
         return $this->respondWithSuccess();
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function medicalPlanHistory(Request $request)
+    {
+        $request->validate([
+            'medical_plan_id' => 'required|integer',
+        ]);
+        return $this->respondWithData(
+            MedicalPlanOperate::with('roleDoctor', 'medicalPlan')
+                ->where('medical_plan_id', $request->input('medical_plan_id'))->get()
+        );
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function optionList(Request $request)
     {
         $request->validate([
@@ -433,6 +597,10 @@ class MedicalController extends Controller
         return $this->respondWithData($plans);
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function memberOptionList(Request $request)
     {
         $request->validate([

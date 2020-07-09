@@ -2,12 +2,26 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7cb8db60-313a-4ee6-bd02-0033d254faaf" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/medical-examination.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/medical-examination.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Api/AuthController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Api/AuthController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Api/MedicalController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Api/MedicalController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Api/MemberController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Api/MemberController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Api/ReserveController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Api/ReserveController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Api/SubscribeController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Api/SubscribeController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Api/SystemController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Api/SystemController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Api/VisitController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Api/VisitController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Model/Member.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Model/Member.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/migrations/2020_07_05_123139_create_roles_doctors_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2020_07_05_123139_create_roles_doctors_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Controller.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Controller.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Model/Manager.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Model/Manager.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Model/MedicalPlanOperate.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Model/MedicalPlanOperate.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Model/RoleDoctor.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Model/RoleDoctor.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Model/Visit.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Model/Visit.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Model/VisitDetails.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Model/VisitDetails.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/composer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2020_07_05_114852_create_managers_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2020_07_05_114852_create_managers_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/http.json" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/api.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -127,6 +141,7 @@
       <path value="$PROJECT_DIR$/vendor/sebastian/version" />
       <path value="$PROJECT_DIR$/vendor/sebastian/recursion-context" />
       <path value="$PROJECT_DIR$/vendor/sebastian/object-enumerator" />
+      <path value="$PROJECT_DIR$/vendor/gregwar/captcha" />
     </include_path>
   </component>
   <component name="ProjectId" id="1eFcl1scmSHmwFIGgafdpr7Ro8o" />
@@ -177,7 +192,7 @@
       <workItem from="1593920950881" duration="14366000" />
       <workItem from="1593999899283" duration="6951000" />
       <workItem from="1594008626801" duration="54370000" />
-      <workItem from="1594192817896" duration="10239000" />
+      <workItem from="1594192817896" duration="34167000" />
     </task>
     <servers />
   </component>
@@ -205,12 +220,12 @@
       <screen x="0" y="23" width="1440" height="877" />
     </state>
     <state x="458" y="215" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.23.1440.877@0.23.1440.877" timestamp="1593963199146" />
-    <state x="534" y="257" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1594186187484">
+    <state x="534" y="257" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1594303820458">
       <screen x="0" y="23" width="1680" height="1027" />
     </state>
     <state x="458" y="223" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.23.1440.877@0.23.1440.877" timestamp="1593963051804" />
-    <state x="534" y="257" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.23.1680.1027@0.23.1680.1027" timestamp="1594141533416" />
-    <state x="534" y="257" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/1680.23.1920.1057/0.23.1680.1027@0.23.1680.1027" timestamp="1594186187484" />
+    <state x="534" y="257" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.23.1680.1027@0.23.1680.1027" timestamp="1594303820458" />
+    <state x="534" y="257" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/1680.23.1920.1057/0.23.1680.1027@0.23.1680.1027" timestamp="1594274932052" />
     <state x="436" y="194" key="NewPhpClassDialog" timestamp="1593952484627">
       <screen x="0" y="23" width="1440" height="877" />
     </state>
@@ -219,6 +234,10 @@
       <screen x="0" y="23" width="1440" height="877" />
     </state>
     <state x="229" y="100" key="SettingsEditor/0.23.1440.877@0.23.1440.877" timestamp="1593950605645" />
+    <state x="541" y="291" width="598" height="490" key="find.popup" timestamp="1594287460771">
+      <screen x="0" y="23" width="1680" height="1027" />
+    </state>
+    <state x="541" y="291" width="598" height="490" key="find.popup/1680.23.1920.1057/0.23.1680.1027@0.23.1680.1027" timestamp="1594287460771" />
     <state x="504" y="259" key="refactoring.ChangeSignatureDialog" timestamp="1593951085303">
       <screen x="0" y="23" width="1440" height="877" />
     </state>

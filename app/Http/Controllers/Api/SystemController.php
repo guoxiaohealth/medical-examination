@@ -15,6 +15,10 @@ use Illuminate\Support\Facades\Hash;
 
 class SystemController extends Controller
 {
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function memberKindList(Request $request)
     {
         return $this->respondWithData(
@@ -22,6 +26,10 @@ class SystemController extends Controller
         );
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function memberKindCreate(Request $request)
     {
         $request->validate([
@@ -35,6 +43,11 @@ class SystemController extends Controller
         return $this->respondWithSuccess();
     }
 
+    /**
+     * @param Request $request
+     * @param MemberKind $memberKind
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function memberKindUpdate(Request $request, MemberKind $memberKind)
     {
         $request->validate([
@@ -47,6 +60,12 @@ class SystemController extends Controller
 
     }
 
+    /**
+     * @param Request $request
+     * @param MemberKind $memberKind
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
     public function memberKindDelete(Request $request, MemberKind $memberKind)
     {
         $memberKind->delete();
@@ -54,6 +73,10 @@ class SystemController extends Controller
     }
 
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function channelList(Request $request)
     {
         return $this->respondWithData(
@@ -61,6 +84,10 @@ class SystemController extends Controller
         );
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function channelCreate(Request $request)
     {
         $request->validate([
@@ -72,6 +99,11 @@ class SystemController extends Controller
         return $this->respondWithSuccess();
     }
 
+    /**
+     * @param Request $request
+     * @param Channel $channel
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function channelUpdate(Request $request, Channel $channel)
     {
         $request->validate([
@@ -82,13 +114,22 @@ class SystemController extends Controller
         return $this->respondWithSuccess();
     }
 
+    /**
+     * @param Request $request
+     * @param Channel $channel
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
     public function channelDelete(Request $request, Channel $channel)
     {
         $channel->delete();
         return $this->respondWithSuccess();
     }
 
-
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function departmentList(Request $request)
     {
         return $this->respondWithData(
@@ -96,6 +137,10 @@ class SystemController extends Controller
         );
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function departmentCreate(Request $request)
     {
         $request->validate([
@@ -107,6 +152,11 @@ class SystemController extends Controller
         return $this->respondWithSuccess();
     }
 
+    /**
+     * @param Request $request
+     * @param Department $department
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function departmentUpdate(Request $request, Department $department)
     {
         $request->validate([
@@ -118,6 +168,12 @@ class SystemController extends Controller
 
     }
 
+    /**
+     * @param Request $request
+     * @param Department $department
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
     public function departmentDelete(Request $request, Department $department)
     {
         $department->delete();
@@ -127,13 +183,22 @@ class SystemController extends Controller
     const roleKind   = 1;
     const doctorKind = 2;
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function doctorList(Request $request)
     {
         return $this->respondWithData(
-            RoleDoctor::with('managers', 'doctorDepartment')->where('kind', self::doctorKind)->get()
+            RoleDoctor::with('managers', 'permissions', 'doctorDepartment')
+                ->where('kind', self::doctorKind)->get()
         );
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function doctorCreate(Request $request)
     {
         $request->validate([
@@ -155,6 +220,12 @@ class SystemController extends Controller
         return $this->respondWithSuccess();
     }
 
+    /**
+     * @param Request $request
+     * @param RoleDoctor $doctor
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
     public function doctorUpdate(Request $request, RoleDoctor $doctor)
     {
         if ($doctor->kind != self::doctorKind) {
@@ -188,6 +259,12 @@ class SystemController extends Controller
 
     }
 
+    /**
+     * @param Request $request
+     * @param RoleDoctor $doctor
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
     public function doctorDelete(Request $request, RoleDoctor $doctor)
     {
         if ($doctor->kind != self::doctorKind) {
@@ -197,6 +274,13 @@ class SystemController extends Controller
         return $this->respondWithSuccess();
     }
 
+
+    /**
+     * @param Request $request
+     * @param RoleDoctor $doctor
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
     public function doctorManager(Request $request, RoleDoctor $doctor)
     {
         if ($doctor->kind != self::doctorKind) {
@@ -204,7 +288,7 @@ class SystemController extends Controller
         }
         $request->validate([
             'account'       => 'string|nullable|max:255',
-            'password'      => 'string|nullable|integer',
+            'password'      => 'string|nullable|max:255',
             'status'        => 'boolean',
             'permissions'   => 'array',
             'permissions.*' => 'integer|exists:permissions,id',
@@ -228,14 +312,21 @@ class SystemController extends Controller
         return $this->respondWithSuccess();
     }
 
-
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function roleList(Request $request)
     {
         return $this->respondWithData(
-            RoleDoctor::with('managers')->where('kind', self::roleKind)->get()
+            RoleDoctor::with('managers', 'permissions')->where('kind', self::roleKind)->get()
         );
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function roleCreate(Request $request)
     {
         $request->validate([
@@ -258,6 +349,12 @@ class SystemController extends Controller
         return $this->respondWithSuccess();
     }
 
+    /**
+     * @param Request $request
+     * @param RoleDoctor $role
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
     public function roleUpdate(Request $request, RoleDoctor $role)
     {
         if ($role->kind != self::roleKind) {
@@ -284,6 +381,12 @@ class SystemController extends Controller
 
     }
 
+    /**
+     * @param Request $request
+     * @param RoleDoctor $role
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
     public function roleDelete(Request $request, RoleDoctor $role)
     {
         if ($role->kind != self::roleKind) {
@@ -293,6 +396,12 @@ class SystemController extends Controller
         return $this->respondWithSuccess();
     }
 
+    /**
+     * @param Request $request
+     * @param RoleDoctor $role
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
     public function roleManagerCreate(Request $request, RoleDoctor $role)
     {
         if ($role->kind != self::roleKind) {
@@ -313,6 +422,12 @@ class SystemController extends Controller
         return $this->respondWithSuccess();
     }
 
+    /**
+     * @param Request $request
+     * @param Manager $manager
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
     public function roleManagerUpdate(Request $request, Manager $manager)
     {
         $request->validate([
@@ -330,6 +445,11 @@ class SystemController extends Controller
         return $this->respondWithSuccess();
     }
 
+    /**
+     * @param Request $request
+     * @param Manager $manager
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function roleManagerStatus(Request $request, Manager $manager)
     {
         $request->validate([
@@ -341,6 +461,17 @@ class SystemController extends Controller
         return $this->respondWithSuccess();
     }
 
+    public function allRole(Request $request)
+    {
+        return $this->respondWithData(
+            RoleDoctor::with('managers')->where('kind', self::roleKind)->get()
+        );
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function permissionList(Request $request)
     {
         return $this->respondWithData(

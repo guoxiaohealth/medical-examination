@@ -16,23 +16,50 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
+    /**
+     * @var mixed
+     */
+    protected $user;
 
-    public function respondWithData($v)
+    /**
+     * @return \Illuminate\Support\Optional|mixed
+     */
+    protected function user()
+    {
+        if (!$this->user) {
+            $this->user = optional(auth()->user());
+        }
+        return $this->user;
+    }
+
+    /**
+     * @param $v
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function respondWithData($v)
     {
         return response()->json($v);
     }
 
-    public function respondWithSuccess()
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function respondWithSuccess()
     {
         return response()->json('success');
     }
 
-    public function respondWithError($error, $status = 400)
+    /**
+     * @param $error
+     * @param int $status
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function respondWithError($error, $status = 400)
     {
         return response()->json(['error' => $error], $status);
     }
 
-    public function meritsAbnormal($merit)
+    protected function meritsAbnormal($merit)
     {
         $merit['ex'] = collect($merit['ex'])->map(function ($v) use ($merit) {
             if (!$merit['value']) {
@@ -75,7 +102,7 @@ class Controller extends BaseController
         return $merit;
     }
 
-    public function medicalPlanMerits(array $merits)
+    protected function medicalPlanMerits(array $merits)
     {
         return collect($merits)->map(function ($v) {
             $merit          = ConfigMerit::where('id', $v['id'])->value('expression');
@@ -84,7 +111,7 @@ class Controller extends BaseController
         });
     }
 
-    public function medicalPlanKinds(array $kinds)
+    protected function medicalPlanKinds(array $kinds)
     {
         return collect($kinds)->map(function ($v) {
             $kind           = ConfigKind::find($v['id']) ?? new \stdClass();

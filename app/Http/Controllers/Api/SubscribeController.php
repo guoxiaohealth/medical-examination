@@ -11,14 +11,22 @@ use Illuminate\Support\Carbon;
 
 class SubscribeController extends Controller
 {
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function reserveTodayList(Request $request)
     {
         return $this->respondWithData(
             Subscribe::with('member', 'member.memberKind', 'member.channel', 'doctor', 'doctor.doctorDepartment')
-                ->where('date', '>=', Carbon::today())->get()
+                ->whereDay('date', Carbon::today())->get()
         );
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function reserveList(Request $request)
     {
         $request->validate([
@@ -43,6 +51,11 @@ class SubscribeController extends Controller
         );
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
     public function reserveCreate(Request $request)
     {
         $request->validate([
@@ -67,6 +80,11 @@ class SubscribeController extends Controller
         return $this->respondWithSuccess();
     }
 
+    /**
+     * @param Request $request
+     * @param Subscribe $subscribe
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function reserveUpdate(Request $request, Subscribe $subscribe)
     {
         $request->validate([
@@ -78,6 +96,12 @@ class SubscribeController extends Controller
         return $this->respondWithSuccess();
     }
 
+    /**
+     * @param Request $request
+     * @param Subscribe $subscribe
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
+     */
     public function reserveDelete(Request $request, Subscribe $subscribe)
     {
         $subscribe->delete();

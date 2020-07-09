@@ -13,7 +13,7 @@ class RoleDoctor extends Model
 
     public function managers()
     {
-        return $this->hasOne(Manager::class, 'role_doctor_id', 'id');
+        return $this->hasMany(Manager::class, 'role_doctor_id', 'id');
     }
 
     public function doctorDepartment()

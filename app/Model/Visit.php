@@ -15,8 +15,8 @@ class Visit extends Model
         return $this->hasOne(Member::class, 'id', 'member_id');
     }
 
-    public function managers()
+    public function manager()
     {
-        return $this->hasOne(Manager::class, 'manager_id', 'id');
+        return $this->hasOne(Manager::class, 'id', 'manager_id');
     }
 }

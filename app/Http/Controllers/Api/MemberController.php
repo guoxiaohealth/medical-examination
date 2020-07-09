@@ -10,6 +10,10 @@ use Illuminate\Http\Request;
 
 class MemberController extends Controller
 {
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function memberList(Request $request)
     {
         $request->validate([
@@ -28,15 +32,19 @@ class MemberController extends Controller
         );
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function memberCreate(Request $request)
     {
         $request->validate([
-            'name'           => 'required|max:255',
-            'sex'            => 'required|in:1,2',
-            'birthday'       => 'required|date_format:Y-m-d H:i:s',
-            'mobile'         => 'required|size:11',
             'member_kind_id' => 'required|integer|exists:member_kinds,id',
             'channel_id'     => 'integer|exists:channels,id',
+            'name'           => 'required|max:255',
+            'sex'            => 'required|in:1,2',
+            'birthday'       => 'required|date_format:Y-m-d',
+            'mobile'         => 'required|size:11',
             'remarks'        => 'string|nullable|max:255',
         ]);
         Member::create([
@@ -51,12 +59,17 @@ class MemberController extends Controller
         return $this->respondWithSuccess();
     }
 
+    /**
+     * @param Request $request
+     * @param Member $member
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function memberUpdate(Request $request, Member $member)
     {
         $request->validate([
             'name'           => 'string|nullable|max:255',
             'sex'            => 'in:1,2',
-            'birthday'       => 'date_format:Y-m-d H:i:s',
+            'birthday'       => 'date_format:Y-m-d',
             'mobile'         => 'size:11',
             'member_kind_id' => 'integer|exists:member_kinds,id',
             'channel_id'     => 'integer|exists:channels,id',

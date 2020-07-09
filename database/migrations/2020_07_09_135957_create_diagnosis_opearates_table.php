@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateManagersTable extends Migration
+class CreateDiagnosisOpearatesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,11 @@ class CreateManagersTable extends Migration
      */
     public function up()
     {
-        Schema::create('managers', function (Blueprint $table) {
+        Schema::create('diagnosis_opearates', function (Blueprint $table) {
             $table->id();
-            $table->string('account')->default('')->unique();
-            $table->string('password')->default('');
-            $table->boolean('status')->default(true);
-            $table->string('name')->default('');
             $table->bigInteger('role_doctor_id')->default(0);
+            $table->bigInteger('diagnosis_id')->default(0);
+            $table->tinyInteger('operate')->default(0);
             $table->timestamps();
         });
     }
@@ -31,6 +29,6 @@ class CreateManagersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('managers');
+        Schema::dropIfExists('diagnosis_opearates');
     }
 }

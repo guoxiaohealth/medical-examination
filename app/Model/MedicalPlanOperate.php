@@ -9,4 +9,14 @@ class MedicalPlanOperate extends Model
     protected $fillable = [
         'role_doctor_id', 'medical_plan_id', 'operate'
     ];
+
+    public function roleDoctor()
+    {
+        return $this->hasOne(RoleDoctor::class, 'id', 'role_doctor_id');
+    }
+
+    public function medicalPlan()
+    {
+        return $this->hasOne(MedicalPlan::class, 'id', 'medical_plan_id');
+    }
 }

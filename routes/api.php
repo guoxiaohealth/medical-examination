@@ -17,38 +17,27 @@ use Illuminate\Routing\Router;
 
 Route::namespace('Api')->group(function (Router $router) {
     $router->group(['prefix' => 'auth'], function (Router $router) {
+        $router->get('captcha', 'AuthController@captcha');
         $router->post('login', 'AuthController@login');
-        $router->post('logout', 'AuthController@logout');
-        $router->post('refresh', 'AuthController@refresh');
-        $router->post('me', 'AuthController@me');
+        $router->get('logout', 'AuthController@logout');
+        $router->get('refresh', 'AuthController@refresh');
+        $router->get('me', 'AuthController@me');
     });
     $router->group(['prefix' => 'reserve'], function (Router $router) {
         $router->group(['prefix' => 'subscribe'], function (Router $router) {
             $router->get('today', 'ReserveController@subscribeTodayList');
             $router->get('week', 'ReserveController@subscribeWeekList');
-            $router->get('months', 'ReserveController@subscribeMonthsList');
+            $router->get('month', 'ReserveController@subscribeMonthList');
             $router->get('total', 'ReserveController@subscribeTotalList');
         });
         $router->group(['prefix' => 'diagnosis'], function (Router $router) {
-            $router->get('check', 'ReserveController@diagnosisCheck');
-            $router->get('list', 'ReserveController@diagnosisList');
             $router->post('create', 'ReserveController@diagnosisCreate');
-            $router->post('finish', 'ReserveController@diagnosisFinish');
-        });
-        $router->group(['prefix' => 'plan'], function (Router $router) {
-            $router->get('check', 'MedicalController@medicalPlanCheck');
-            $router->post('create', 'MedicalController@medicalPlanCreate');
-        });
-        $router->group(['prefix' => 'medical'], function (Router $router) {
-            $router->get('list', 'ReserveController@medicalPlanList');
-            $router->post('create', 'ReserveController@medicalPlanCreate');
-        });
-        $router->group(['prefix' => 'archives'], function (Router $router) {
-            $router->get('list', 'ReserveController@archivesList');
-            $router->get('options', 'MedicalController@memberOptionList');
             $router->get('check', 'ReserveController@diagnosisCheck');
+            $router->get('finish', 'ReserveController@diagnosisFinish');
+            $router->get('mine', 'ReserveController@diagnosisMineList');
+            $router->get('list', 'ReserveController@diagnosisTotalList');
+            $router->get('history', 'ReserveController@diagnosisHistory');
         });
-        $router->get('patient', 'ReserveController@patientList');
     });
     $router->group(['prefix' => 'subscribe'], function (Router $router) {
         $router->get('today', 'SubscribeController@reserveTodayList');
@@ -64,10 +53,7 @@ Route::namespace('Api')->group(function (Router $router) {
             $router->post('create', 'MedicalController@medicalPlanCreate');
             $router->put('update/{medical_plan}', 'MedicalController@medicalPlanUpdate');
             $router->delete('delete/{medical_plan}', 'MedicalController@medicalPlanDelete');
-        });
-        $router->group(['prefix' => 'abnormal'], function (Router $router) {
-            $router->get('list', 'MedicalController@medicalPlanList');
-            $router->get('check', 'MedicalController@medicalPlanCheck');
+            $router->get('history', 'MedicalController@medicalPlanHistory');
         });
         $router->group(['prefix' => 'option'], function (Router $router) {
             $router->get('list', 'MedicalController@optionList');
@@ -109,20 +95,19 @@ Route::namespace('Api')->group(function (Router $router) {
         });
     });
     $router->group(['prefix' => 'visit'], function (Router $router) {
-        $router->get('mine', 'VisitController@planMine');
-        $router->get('list', 'VisitController@planList');
-        $router->get('total', 'VisitController@planTotal');
-        $router->post('check/{visit_details}', 'VisitController@planCheck');
+        $router->get('mine', 'VisitController@visitDetailsMine');
+        $router->get('total', 'VisitController@visitDetailsTotal');
+        $router->get('plans', 'VisitController@planList');
         $router->post('create', 'VisitController@planCreate');
-        $router->get('records', 'VisitController@planRecords');
+        $router->get('member', 'VisitController@visitDetailsList');
+        $router->post('check/{visit}', 'VisitController@planCheck');
     });
-
     $router->group(['prefix' => 'member'], function (Router $router) {
         $router->get('list', 'MemberController@memberList');
         $router->post('create', 'MemberController@memberCreate');
         $router->put('update/{member}', 'MemberController@memberUpdate');
     });
-    $router->group(['prefix' => 'system'], function (Router $router) {
+    $router->group(['prefix' => 'system', 'middleware' => 'auth:api'], function (Router $router) {
         $router->group(['prefix' => 'member_kind'], function (Router $router) {
             $router->get('list', 'SystemController@memberKindList');
             $router->post('create', 'SystemController@memberKindCreate');
@@ -146,22 +131,23 @@ Route::namespace('Api')->group(function (Router $router) {
             $router->post('create', 'SystemController@doctorCreate');
             $router->put('update/{doctor}', 'SystemController@doctorUpdate');
             $router->delete('delete/{doctor}', 'SystemController@doctorDelete');
-            $router->put('manager/{doctor}', 'SystemController@doctorManager');
+            $router->post('manager/{doctor}', 'SystemController@doctorManager');
         });
         $router->group(['prefix' => 'role'], function (Router $router) {
             $router->get('list', 'SystemController@roleList');
             $router->post('create', 'SystemController@roleCreate');
             $router->put('update/{role}', 'SystemController@roleUpdate');
             $router->delete('delete/{role}', 'SystemController@roleDelete');
-            $router->put('manager/create/{role}', 'SystemController@roleManagerCreate');
+            $router->post('manager/create/{role}', 'SystemController@roleManagerCreate');
             $router->put('manager/update/{manager}', 'SystemController@roleManagerUpdate');
             $router->put('manager/status/{manager}', 'SystemController@roleManagerStatus');
+            $router->get('all', 'SystemController@allRole');
+
         });
         $router->group(['prefix' => 'permission'], function (Router $router) {
             $router->get('list', 'SystemController@permissionList');
         });
     });
-
 });
 
 
