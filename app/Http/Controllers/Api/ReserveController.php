@@ -200,8 +200,13 @@ class ReserveController extends Controller
 
     public function diagnosisMineList(Request $request)
     {
-        $member = Member::with('memberKind', 'channel', 'diagnosis', 'medicalPlans')
-            ->whereHas('diagnosis', function (Builder $query) {
+        $request->validate([
+            'search' => 'string|nullable|max:255',
+        ]);
+        $member = Member::with('memberKind', 'channel', 'diagnosis', 'diagnosis.doctor', 'medicalPlans')
+            ->when($request->input('search'), function (Builder $query, $value) {
+                $query->whereRaw('CONCAT(name,mobile) LIKE ?', "%{$value}%");
+            })->whereHas('diagnosis', function (Builder $query) {
                 $query->where('doctor_id', $this->user()->role_doctor_id);
             })->paginate();
         $member->map(function ($v) {
@@ -215,8 +220,13 @@ class ReserveController extends Controller
 
     public function diagnosisTotalList(Request $request)
     {
-        $member = Member::with('memberKind', 'channel', 'diagnosis', 'medicalPlans')
-            ->paginate();
+        $request->validate([
+            'search' => 'string|nullable|max:255',
+        ]);
+        $member = Member::with('memberKind', 'channel', 'diagnosis', 'diagnosis.doctor', 'medicalPlans')
+            ->when($request->input('search'), function (Builder $query, $value) {
+                $query->whereRaw('CONCAT(name,mobile) LIKE ?', "%{$value}%");
+            })->paginate();
         $member->map(function ($v) {
             $v->last_diagnosis     = $v->diagnosis->last();
             $v->last_medical_plans = $v->medicalPlans->last();
