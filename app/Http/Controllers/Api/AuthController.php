@@ -52,13 +52,13 @@ class AuthController extends Controller
             'captcha'  => 'required|max:255',
         ]);
         if (!Cache::has($request->input('captcha'))) {
-            throw new \Exception('invalid captcha', 401);
+            throw new \Exception('无效的验证码', 401);
         }
         if (!$token = auth()->attempt($request->only(['account', 'password']))) {
-            throw new \Exception('invalid account or password', 401);
+            throw new \Exception('账户或密码错误', 401);
         }
         if (!$this->user()->status) {
-            throw new \Exception('invalid account', 401);
+            throw new \Exception('账户禁止登陆', 401);
         }
         return $this->respondWithToken($token);
     }
