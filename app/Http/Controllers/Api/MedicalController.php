@@ -614,7 +614,7 @@ class MedicalController extends Controller
                     if (empty($m)) {
                         $v->mechanism = null;
                     } else {
-                        $v->mechanism = Mechanism::query()->where('id', $m['mechanism_id']);
+                        $v->mechanism = Mechanism::query()->where('id', $m->mechanism_id);
                     }
                     $v->medical_plans_kinds    = $kinds->count();
                     $v->medical_plans_projects = $kinds->pluck('projects')->flatten(1)->count();
