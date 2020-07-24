@@ -563,11 +563,13 @@ class MedicalController extends Controller
     public function medicalPlanHistory(Request $request)
     {
         $request->validate([
-            'medical_plan_id' => 'required|integer',
+            'medical_plan_id' => 'integer',
         ]);
         return $this->respondWithData(
             MedicalPlanOperate::with('roleDoctor', 'medicalPlan')
-                ->where('medical_plan_id', $request->input('medical_plan_id'))->get()
+                ->when($request->input('medical_plan_id'), function (Builder $query, $value) {
+                    $query->where('medical_plan_id', $value);
+                })->get()
         );
     }
 
@@ -618,7 +620,7 @@ class MedicalController extends Controller
                     if (empty($m)) {
                         $v->mechanism = null;
                     } else {
-                        $v->mechanism = Mechanism::query()->find( $m->mechanism_id);
+                        $v->mechanism = Mechanism::query()->find($m->mechanism_id);
                     }
                     unset($v->kinds);
                     return $v;
