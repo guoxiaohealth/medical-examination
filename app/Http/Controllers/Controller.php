@@ -90,6 +90,14 @@ class Controller extends BaseController
                     }
                     $v['status'] = floatval($cmp[0]) <= floatval($merit['value']) && floatval($merit['value']) <= floatval($cmp[1]);
                     break;
+                case 'rangeout':
+                    $cmp = explode(',', strval($v['values']));
+                    if (count($cmp) != 2) {
+                        $v['status'] = null;
+                        break;
+                    }
+                    $v['status'] = floatval($cmp[0]) > floatval($merit['value']) && floatval($merit['value']) < floatval($cmp[1]);
+                    break;
                 case 'match':
                     $v['status'] = Str::contains(strval($v['values']), strval($merit['value']));
                     break;
