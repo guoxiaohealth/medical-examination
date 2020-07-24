@@ -398,7 +398,7 @@ class MedicalController extends Controller
             'expression.ex.*.alert'    => 'required_with:expression|string',
             'expression.ex.*.solution' => 'required_with:expression|string',
         ]);
-        $data = $request->only(['config_subject_id', 'name', 'unit', 'type', 'expression']);
+        $data = $request->only(['config_subject_id', 'name', 'unit', 'range', 'type', 'expression']);
         $configMerit->update(array_filter($data));
         return $this->respondWithSuccess();
     }
