@@ -609,7 +609,13 @@ class MedicalController extends Controller
         return $this->respondWithData(
             MedicalPlan::with('doctor')->where('member_id', $request->input('member_id'))
                 ->get()->map(function ($v) {
-                    $kinds                     = collect($v->kinds);
+                    $kinds = collect($v->kinds);
+                    $m     = $kinds->random();
+                    if (empty($m)) {
+                        $v->mechanism = null;
+                    } else {
+                        $v->mechanism = Mechanism::query()->where('id', $m['mechanism_id']);
+                    }
                     $v->medical_plans_kinds    = $kinds->count();
                     $v->medical_plans_projects = $kinds->pluck('projects')->flatten(1)->count();
                     $v->medical_plans_subjects = $kinds->pluck('projects.*.subjects')->flatten(2)->count();
