@@ -59,52 +59,45 @@ class Controller extends BaseController
         return response()->json(['error' => $error], $status);
     }
 
+    protected function cmp($merit, $value)
+    {
+        if (!$value) {
+            return null;
+        }
+        switch ($merit['symbol']) {
+            case 'eq':
+                return $value == $merit['values'];
+            case 'gt':
+                return floatval($value) > floatval($merit['values']);
+            case 'gte':
+                return floatval($value) >= floatval($merit['values']);
+            case 'lt':
+                return floatval($value) < floatval($merit['values']);
+            case 'lte':
+                return floatval($value) <= floatval($merit['values']);
+            case 'range':
+                $cmp = explode(',', strval($merit['values']));
+                if (count($cmp) != 2) {
+                    return null;
+                }
+                return floatval($cmp[0]) <= floatval($value) && floatval($value) <= floatval($cmp[1]);
+            case 'rangeout':
+                $cmp = explode(',', strval($merit['values']));
+                if (count($cmp) != 2) {
+                    return null;
+                }
+                return floatval($cmp[0]) > floatval($value) && floatval($value) < floatval($cmp[1]);
+            case 'match':
+                return Str::contains(strval($merit['values']), strval($value));
+            default:
+                return null;
+        }
+    }
+
     protected function meritsAbnormal($merit)
     {
         $merit['ex'] = collect($merit['ex'])->map(function ($v) use ($merit) {
-            if (!$merit['value']) {
-                $v['status'] = null;
-                return $v;
-            }
-            switch ($v['symbol']) {
-                case 'eq':
-                    $v['status'] = $merit['value'] == $v['values'];
-                    break;
-                case 'gt':
-                    $v['status'] = floatval($merit['value']) > floatval($v['values']);
-                    break;
-                case 'gte':
-                    $v['status'] = floatval($merit['value']) >= floatval($v['values']);
-                    break;
-                case 'lt':
-                    $v['status'] = floatval($merit['value']) < floatval($v['values']);
-                    break;
-                case 'lte':
-                    $v['status'] = floatval($merit['value']) <= floatval($v['values']);
-                    break;
-                case 'range':
-                    $cmp = explode(',', strval($v['values']));
-                    if (count($cmp) != 2) {
-                        $v['status'] = null;
-                        break;
-                    }
-                    $v['status'] = floatval($cmp[0]) <= floatval($merit['value']) && floatval($merit['value']) <= floatval($cmp[1]);
-                    break;
-                case 'rangeout':
-                    $cmp = explode(',', strval($v['values']));
-                    if (count($cmp) != 2) {
-                        $v['status'] = null;
-                        break;
-                    }
-                    $v['status'] = floatval($cmp[0]) > floatval($merit['value']) && floatval($merit['value']) < floatval($cmp[1]);
-                    break;
-                case 'match':
-                    $v['status'] = Str::contains(strval($v['values']), strval($merit['value']));
-                    break;
-                default:
-                    $v['status'] = null;
-                    break;
-            }
+            $v['status'] = $this->cmp($v, $merit['value']);
             return $v;
         });
         return $merit;
@@ -117,6 +110,14 @@ class Controller extends BaseController
             $merit['value'] = $v['value'];
             return $this->meritsAbnormal($merit);
         });
+    }
+
+    protected function meritAbnormal($merit)
+    {
+        foreach ($merit['expression']['ex'] as $key => $ex) {
+            $merit['expression']['ex'][$key]['status'] = $this->cmp($ex, $merit['value']);
+        }
+        return $merit;
     }
 
     protected function medicalPlanKinds(array $kinds)
@@ -133,10 +134,10 @@ class Controller extends BaseController
                     $subject->original = $v['original'];
                     $subject->date     = $v['date'];
                     $subject->merits   = collect($v['merits'])->map(function ($v) {
-                        $merit        = ConfigMerit::find($v['id']) ?? new \stdClass();
-                        $merit->id    = $v['id'];
-                        $merit->value = $v['value'];
-                        return $this->meritsAbnormal($merit);
+                        $merit          = ConfigMerit::find($v['id'])->toArray() ?? [];
+                        $merit['id']    = $v['id'];
+                        $merit['value'] = $v['value'];
+                        return $this->meritAbnormal($merit);
                     });
                     return $subject;
                 });
