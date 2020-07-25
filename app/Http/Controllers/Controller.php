@@ -136,7 +136,7 @@ class Controller extends BaseController
                         $merit        = ConfigMerit::find($v['id']) ?? new \stdClass();
                         $merit->id    = $v['id'];
                         $merit->value = $v['value'];
-                        return $merit;
+                        return $this->meritsAbnormal($merit);
                     });
                     return $subject;
                 });
