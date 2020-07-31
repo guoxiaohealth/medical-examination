@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Model\Channel;
 use App\Model\Department;
 use App\Model\Manager;
+use App\Model\Member;
 use App\Model\MemberKind;
 use App\Model\Permission;
 use App\Model\RoleDoctor;
@@ -69,6 +70,9 @@ class SystemController extends Controller
      */
     public function memberKindDelete(Request $request, MemberKind $memberKind)
     {
+        if (Member::query()->where('member_kind_id', $memberKind->id)->exists()) {
+            return $this->respondWithError('存在会员,删除失败');
+        }
         $memberKind->delete();
         return $this->respondWithSuccess();
     }
@@ -123,6 +127,9 @@ class SystemController extends Controller
      */
     public function channelDelete(Request $request, Channel $channel)
     {
+        if (Member::query()->where('channel_id', $channel->id)->exists()) {
+            return $this->respondWithError('存在会员,删除失败');
+        }
         $channel->delete();
         return $this->respondWithSuccess();
     }
@@ -177,6 +184,9 @@ class SystemController extends Controller
      */
     public function departmentDelete(Request $request, Department $department)
     {
+        if (RoleDoctor::query()->where('doctor_department_id', $department->id)->exists()) {
+            return $this->respondWithError('存在医生,删除失败');
+        }
         $department->delete();
         return $this->respondWithSuccess();
     }
