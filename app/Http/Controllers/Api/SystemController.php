@@ -10,6 +10,7 @@ use App\Model\Member;
 use App\Model\MemberKind;
 use App\Model\Permission;
 use App\Model\RoleDoctor;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -200,9 +201,14 @@ class SystemController extends Controller
      */
     public function doctorList(Request $request)
     {
+        $request->validate([
+            'department_id' => 'integer',
+        ]);
         return $this->respondWithData(
             RoleDoctor::with('managers', 'permissions', 'doctorDepartment')
-                ->where('kind', self::doctorKind)->get()
+                ->when($request->input('department_id'), function (Builder $query, $value) {
+                    $query->where('doctor_department_id', $value);
+                })->where('kind', self::doctorKind)->get()
         );
     }
 

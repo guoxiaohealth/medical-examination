@@ -41,6 +41,7 @@ Route::namespace('Api')->group(function (Router $router) {
     });
     $router->group(['prefix' => 'subscribe', 'middleware' => 'auth:api'], function (Router $router) {
         $router->get('today', 'SubscribeController@reserveTodayList');
+        $router->get('new', 'SubscribeController@reserveNewList');
         $router->get('list', 'SubscribeController@reserveList');
         $router->post('create', 'SubscribeController@reserveCreate');
         $router->put('update/{subscribe}', 'SubscribeController@reserveUpdate');

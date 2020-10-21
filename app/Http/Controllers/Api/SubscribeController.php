@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 
 use App\Model\Subscribe;
+use Carbon\CarbonPeriod;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 
 class SubscribeController extends Controller
 {
@@ -21,6 +23,34 @@ class SubscribeController extends Controller
             Subscribe::with('member', 'member.memberKind', 'member.channel', 'doctor', 'doctor.doctorDepartment')
                 ->whereDay('date', Carbon::today())->get()
         );
+    }
+
+    public function reserveNewList(Request $request)
+    {
+        $request->validate([
+            'doctor_id' => 'required|integer',
+            'date'      => 'required|date_format:Y-m',
+        ]);
+        $date      = Carbon::parse($request->input('date'));
+        $subscribe = Subscribe::query()->whereBetween('date',
+            [$date->clone()->startOfMonth(), $date->clone()->endOfMonth()])
+            ->where('doctor_id', $request->input('doctor_id'))
+            ->get();
+        $period    = $date->daysUntil($date->clone()->endOfMonth());
+        $data      = [];
+        foreach ($period as $date) {
+            $days              = $date->format('Y-m-d');
+            $xx                = $subscribe->filter(function ($v) use ($days) {
+                return Str::contains($v->date, $days);
+            });
+            $data[$days]['am'] = $xx->filter(function ($v) {
+                return Carbon::parse($v->date)->format('A') == 'AM';
+            });
+            $data[$days]['pm'] = $xx->filter(function ($v) {
+                return Carbon::parse($v->date)->format('A') == 'PM';
+            });
+        }
+        return $this->respondWithData($data);
     }
 
     /**
