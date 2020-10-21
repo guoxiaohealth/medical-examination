@@ -31,23 +31,32 @@ class SubscribeController extends Controller
             'doctor_id' => 'required|integer',
             'date'      => 'required|date_format:Y-m',
         ]);
-        $date      = Carbon::parse($request->input('date'));
-        $subscribe = Subscribe::query()->whereBetween('date',
-            [$date->clone()->startOfMonth(), $date->clone()->endOfMonth()])
+        $date = Carbon::parse($request->input('date'));
+
+        $subscribe = Subscribe::query()
+            ->with('member', 'member.memberKind')
+            ->whereBetween('date', [$date->clone()->startOfMonth(), $date->clone()->endOfMonth()])
             ->where('doctor_id', $request->input('doctor_id'))
             ->get();
-        $period    = $date->daysUntil($date->clone()->endOfMonth());
-        $data      = [];
+
+        $period = $date->daysUntil($date->clone()->endOfMonth());
+        $data   = [];
         foreach ($period as $date) {
             $days              = $date->format('Y-m-d');
             $xx                = $subscribe->filter(function ($v) use ($days) {
                 return Str::contains($v->date, $days);
             });
             $data[$days]['am'] = $xx->filter(function ($v) {
-                return Carbon::parse($v->date)->format('A') == 'AM';
+                $hours = Carbon::parse($v->date)->format('H');
+                return $hours <= 12;
             });
             $data[$days]['pm'] = $xx->filter(function ($v) {
-                return Carbon::parse($v->date)->format('A') == 'PM';
+                $hours = Carbon::parse($v->date)->format('H');
+                return $hours > 12 && $hours <= 18;
+            });
+            $data[$days]['ni'] = $xx->filter(function ($v) {
+                $hours = Carbon::parse($v->date)->format('H');
+                return $hours > 18 && $hours <= 24;
             });
         }
         return $this->respondWithData($data);
