@@ -49,15 +49,15 @@ class SubscribeController extends Controller
             $data[$days]['am'] = $xx->filter(function ($v) {
                 $hours = Carbon::parse($v->date)->format('H');
                 return $hours <= 12;
-            })->toArray();
+            })->values();
             $data[$days]['pm'] = $xx->filter(function ($v) {
                 $hours = Carbon::parse($v->date)->format('H');
                 return $hours > 12 && $hours <= 18;
-            })->toArray();
+            })->values();
             $data[$days]['ni'] = $xx->filter(function ($v) {
                 $hours = Carbon::parse($v->date)->format('H');
                 return $hours > 18 && $hours <= 24;
-            })->toArray();
+            })->values();
         }
         return $this->respondWithData($data);
     }
