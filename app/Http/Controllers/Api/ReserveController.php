@@ -30,7 +30,7 @@ class ReserveController extends Controller
         $subscribes = Subscribe::with('member', 'member.memberKind', 'member.channel', 'doctor',
             'doctor.doctorDepartment')
             ->where('doctor_id', $this->user()->role_doctor_id)
-            ->whereDay('date', Carbon::today())->get();
+            ->whereBetween('date', [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()])->get();
 
         return $this->respondWithData([
             'am' => $subscribes->filter(function ($v) {
@@ -99,7 +99,7 @@ class ReserveController extends Controller
         $subscribes = Subscribe::with('member', 'member.memberKind', 'member.channel', 'doctor',
             'doctor.doctorDepartment')
             ->where('doctor_id', $this->user()->role_doctor_id)
-            ->whereMonth('date', Carbon::now()->startOfMonth())->get();
+            ->whereBetween('date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])->get();
 
         $date   = Carbon::now();
         $period = $date->clone()->startOfMonth()->daysUntil($date->clone()->endOfMonth());
