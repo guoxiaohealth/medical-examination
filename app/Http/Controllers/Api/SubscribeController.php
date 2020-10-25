@@ -43,18 +43,18 @@ class SubscribeController extends Controller
         $data   = [];
         foreach ($period as $date) {
             $days              = $date->format('Y-m-d');
-            $xx                = $subscribe->filter(function ($v) use ($days) {
+            $currentDay        = $subscribe->filter(function ($v) use ($days) {
                 return Str::contains($v->date, $days);
             });
-            $data[$days]['am'] = $xx->filter(function ($v) {
+            $data[$days]['am'] = $currentDay->filter(function ($v) {
                 $hours = Carbon::parse($v->date)->format('H');
                 return $hours <= 12;
             })->values();
-            $data[$days]['pm'] = $xx->filter(function ($v) {
+            $data[$days]['pm'] = $currentDay->filter(function ($v) {
                 $hours = Carbon::parse($v->date)->format('H');
                 return $hours > 12 && $hours <= 18;
             })->values();
-            $data[$days]['ni'] = $xx->filter(function ($v) {
+            $data[$days]['ni'] = $currentDay->filter(function ($v) {
                 $hours = Carbon::parse($v->date)->format('H');
                 return $hours > 18 && $hours <= 24;
             })->values();

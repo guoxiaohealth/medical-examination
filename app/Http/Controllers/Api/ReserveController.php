@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class ReserveController extends Controller
 {
@@ -26,11 +27,25 @@ class ReserveController extends Controller
      */
     public function subscribeTodayList(Request $request)
     {
-        return $this->respondWithData(
-            Subscribe::with('member', 'member.memberKind', 'member.channel', 'doctor', 'doctor.doctorDepartment')
-                ->where('doctor_id', $this->user()->role_doctor_id)
-                ->whereDay('date', Carbon::today())->get()
-        );
+        $subscribes = Subscribe::with('member', 'member.memberKind', 'member.channel', 'doctor',
+            'doctor.doctorDepartment')
+            ->where('doctor_id', $this->user()->role_doctor_id)
+            ->whereDay('date', Carbon::today())->get();
+
+        return $this->respondWithData([
+            'am' => $subscribes->filter(function ($v) {
+                $hours = Carbon::parse($v->date)->format('H');
+                return $hours <= 12;
+            })->values(),
+            'pm' => $subscribes->filter(function ($v) {
+                $hours = Carbon::parse($v->date)->format('H');
+                return $hours > 12 && $hours <= 18;
+            })->values(),
+            'ni' => $subscribes->filter(function ($v) {
+                $hours = Carbon::parse($v->date)->format('H');
+                return $hours > 18 && $hours <= 24;
+            })->values(),
+        ]);
     }
 
     /**
@@ -39,12 +54,40 @@ class ReserveController extends Controller
      */
     public function subscribeWeekList(Request $request)
     {
-        return $this->respondWithData(
-            Subscribe::with('member', 'member.memberKind', 'member.channel', 'doctor', 'doctor.doctorDepartment')
-                ->where('doctor_id', $this->user()->role_doctor_id)
-                ->where('date', '>=', Carbon::now()->startOfWeek())
-                ->where('date', '<=', Carbon::now()->endOfWeek())->get()
-        );
+        $subscribes = Subscribe::with('member', 'member.memberKind', 'member.channel', 'doctor',
+            'doctor.doctorDepartment')
+            ->where('doctor_id', $this->user()->role_doctor_id)
+            ->where('date', '>=', Carbon::now()->startOfWeek())
+            ->where('date', '<=', Carbon::now()->endOfWeek())->get();
+
+        $date = Carbon::now();
+
+        $first = $date->clone()->subDays($date->clone()->dayOfWeek);
+
+        $end = $date->clone()->addDays(7 - $date->clone()->dayOfWeek - 1);
+
+        $period = $first->daysUntil($end);
+        $data   = [];
+
+        foreach ($period as $date) {
+            $days              = $date->format('Y-m-d');
+            $currentDay        = $subscribes->filter(function ($v) use ($days) {
+                return Str::contains($v->date, $days);
+            });
+            $data[$days]['am'] = $currentDay->filter(function ($v) {
+                $hours = Carbon::parse($v->date)->format('H');
+                return $hours <= 12;
+            })->values();
+            $data[$days]['pm'] = $currentDay->filter(function ($v) {
+                $hours = Carbon::parse($v->date)->format('H');
+                return $hours > 12 && $hours <= 18;
+            })->values();
+            $data[$days]['ni'] = $currentDay->filter(function ($v) {
+                $hours = Carbon::parse($v->date)->format('H');
+                return $hours > 18 && $hours <= 24;
+            })->values();
+        }
+        return $this->respondWithData($data);
     }
 
     /**
@@ -53,11 +96,33 @@ class ReserveController extends Controller
      */
     public function subscribeMonthList(Request $request)
     {
-        return $this->respondWithData(
-            Subscribe::with('member', 'member.memberKind', 'member.channel', 'doctor', 'doctor.doctorDepartment')
-                ->where('doctor_id', $this->user()->role_doctor_id)
-                ->whereMonth('date', Carbon::now()->startOfMonth())->get()
-        );
+        $subscribes = Subscribe::with('member', 'member.memberKind', 'member.channel', 'doctor',
+            'doctor.doctorDepartment')
+            ->where('doctor_id', $this->user()->role_doctor_id)
+            ->whereMonth('date', Carbon::now()->startOfMonth())->get();
+
+        $date   = Carbon::now();
+        $period = $date->clone()->startOfMonth()->daysUntil($date->clone()->endOfMonth());
+        $data   = [];
+        foreach ($period as $date) {
+            $days              = $date->format('Y-m-d');
+            $currentDay        = $subscribes->filter(function ($v) use ($days) {
+                return Str::contains($v->date, $days);
+            });
+            $data[$days]['am'] = $currentDay->filter(function ($v) {
+                $hours = Carbon::parse($v->date)->format('H');
+                return $hours <= 12;
+            })->values();
+            $data[$days]['pm'] = $currentDay->filter(function ($v) {
+                $hours = Carbon::parse($v->date)->format('H');
+                return $hours > 12 && $hours <= 18;
+            })->values();
+            $data[$days]['ni'] = $currentDay->filter(function ($v) {
+                $hours = Carbon::parse($v->date)->format('H');
+                return $hours > 18 && $hours <= 24;
+            })->values();
+        }
+        return $this->respondWithData($data);
     }
 
     /**
