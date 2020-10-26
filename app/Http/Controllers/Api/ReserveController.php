@@ -298,4 +298,15 @@ class ReserveController extends Controller
         });
         return $this->respondWithData($member);
     }
+
+    public function diagnosisRecord(Request $request)
+    {
+        $request->validate([
+            'member_id' => 'required|integer|exists:members,id',
+        ]);
+        $diagnosis = Diagnosis::with('member', 'member.memberKind', 'member.medicalPlans', 'doctor')
+            ->where('member_id', $request->input('member_id'))
+            ->orderByDesc('id')->get();
+        return $this->respondWithData($diagnosis);
+    }
 }

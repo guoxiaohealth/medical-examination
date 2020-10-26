@@ -37,6 +37,8 @@ Route::namespace('Api')->group(function (Router $router) {
             $router->get('mine', 'ReserveController@diagnosisMineList');
             $router->get('list', 'ReserveController@diagnosisTotalList');
             $router->get('history', 'ReserveController@diagnosisHistory');
+            $router->get('record', 'ReserveController@diagnosisRecord');
+
         });
     });
     $router->group(['prefix' => 'subscribe', 'middleware' => 'auth:api'], function (Router $router) {
