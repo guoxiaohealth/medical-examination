@@ -214,23 +214,24 @@ class ReserveController extends Controller
         $request->validate([
             'subscribe_id' => 'required|integer|exists:subscribes,id',
         ]);
-        return $this->respondWithData(
-            Diagnosis::with('member', 'member.memberKind', 'member.medicalPlans', 'member.channel', 'doctor')
-                ->where('subscribe_id', $request->input('subscribe_id'))
-                ->orderByDesc('id')->get()->map(function ($v) {
-                    $medicalPlans = collect(optional($v->member)->medicalPlans);
-                    //
-                    $v->medical_plan_date = optional($medicalPlans->last())->updated_at;
-                    //
-                    $v->medical_plan_merits_abnormal = $this->medicalPlanMerits(
-                        $medicalPlans->pluck('kinds.*.projects.*.subjects.*.merits')->flatten(2)->toArray()
-                    )->pluck('ex.*.status')->flatten(1)->filter(function ($v) {
-                        return $v === false;
-                    })->count();
-                    unset($v->member->medicalPlans);
-                    return $v;
-                })
-        );
+        $subscribe = Subscribe::with('diagnose', 'member', 'member.memberKind', 'member.medicalPlans', 'doctor')
+            ->where('id', $request->input('subscribe_id'))
+            ->first();
+        if (!$subscribe) {
+            $medicalPlans = collect(optional($subscribe->member)->medicalPlans);
+            //
+            $subscribe->medical_plan_date = optional($medicalPlans->last())->updated_at;
+            //
+            $subscribe->medical_plan_merits_abnormal = $this->medicalPlanMerits(
+                $medicalPlans->pluck('kinds.*.projects.*.subjects.*.merits')->flatten(2)->toArray()
+            )->pluck('ex.*.status')->flatten(1)->filter(function ($v) {
+                return $v === false;
+            })->count();
+        } else {
+            $subscribe->medical_plan_date            = null;
+            $subscribe->medical_plan_merits_abnormal = 0;
+        }
+        return $this->respondWithData($subscribe);
     }
 
     /**
