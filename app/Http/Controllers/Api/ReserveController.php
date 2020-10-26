@@ -227,9 +227,6 @@ class ReserveController extends Controller
             )->pluck('ex.*.status')->flatten(1)->filter(function ($v) {
                 return $v === false;
             })->count();
-        } else {
-            $subscribe->medical_plan_date            = null;
-            $subscribe->medical_plan_merits_abnormal = 0;
         }
         return $this->respondWithData($subscribe);
     }
