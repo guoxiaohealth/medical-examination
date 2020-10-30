@@ -484,9 +484,9 @@ class MedicalController extends Controller
             'kinds.*.projects.*.subjects'                  => 'required_with:kinds|array',
             'kinds.*.projects.*.subjects.*.id'             => 'required_with:kinds|integer|exists:config_subjects,id',
             'kinds.*.projects.*.subjects.*.original'       => 'string|nullable|max:255',
-            'kinds.*.projects.*.subjects.*.date'           => 'required_with:kinds|date_format:Y-m-d',
-            'kinds.*.projects.*.subjects.*.merits'         => 'required_with:kinds|array',
-            'kinds.*.projects.*.subjects.*.merits.*.id'    => 'required_with:kinds|integer|exists:config_merits,id',
+            'kinds.*.projects.*.subjects.*.date'           => 'date_format:Y-m-d',
+            'kinds.*.projects.*.subjects.*.merits'         => 'array',
+            'kinds.*.projects.*.subjects.*.merits.*.id'    => 'integer|exists:config_merits,id',
             'kinds.*.projects.*.subjects.*.merits.*.value' => 'string|nullable|max:255',
         ]);
         DB::transaction(function () use ($request) {
@@ -520,10 +520,10 @@ class MedicalController extends Controller
             'kinds.*.projects.*.subjects'                  => 'required|array',
             'kinds.*.projects.*.subjects.*.id'             => 'required|integer|exists:config_subjects,id',
             'kinds.*.projects.*.subjects.*.original'       => 'string|nullable|max:255',
-            'kinds.*.projects.*.subjects.*.date'           => 'required|date_format:Y-m-d',
-            'kinds.*.projects.*.subjects.*.merits'         => 'required|array',
-            'kinds.*.projects.*.subjects.*.merits.*.id'    => 'required|integer|exists:config_merits,id',
-            'kinds.*.projects.*.subjects.*.merits.*.value' => 'required|string',
+            'kinds.*.projects.*.subjects.*.date'           => 'date_format:Y-m-d',
+            'kinds.*.projects.*.subjects.*.merits'         => 'array',
+            'kinds.*.projects.*.subjects.*.merits.*.id'    => 'integer|exists:config_merits,id',
+            'kinds.*.projects.*.subjects.*.merits.*.value' => 'string',
         ]);
         DB::transaction(function () use ($request, $medicalPlan) {
             $medicalPlan->update([

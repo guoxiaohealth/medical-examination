@@ -214,7 +214,8 @@ class ReserveController extends Controller
         $request->validate([
             'subscribe_id' => 'required|integer|exists:subscribes,id',
         ]);
-        $subscribe = Subscribe::with('diagnose', 'member', 'member.memberKind', 'member.medicalPlans', 'doctor')
+        $subscribe = Subscribe::with('diagnose', 'member', 'member.memberKind', 'member.medicalPlans', 'doctor',
+            'doctor.doctorDepartment')
             ->where('id', $request->input('subscribe_id'))
             ->first();
         if (!$subscribe) {
@@ -286,7 +287,8 @@ class ReserveController extends Controller
         $request->validate([
             'search' => 'string|nullable|max:255',
         ]);
-        $member = Member::with('memberKind', 'channel', 'diagnosis', 'diagnosis.doctor', 'medicalPlans')
+        $member = Member::with('memberKind', 'channel', 'diagnosis', 'diagnosis.doctor',
+            'diagnosis.doctor.doctorDepartment', 'medicalPlans')
             ->when($request->input('search'), function (Builder $query, $value) {
                 $query->whereRaw('CONCAT(name,mobile) LIKE ?', "%{$value}%");
             })->paginate();
