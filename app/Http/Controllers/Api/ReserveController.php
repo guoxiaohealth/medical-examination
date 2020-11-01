@@ -306,7 +306,8 @@ class ReserveController extends Controller
         $request->validate([
             'member_id' => 'required|integer|exists:members,id',
         ]);
-        $diagnosis = Diagnosis::with('member', 'member.memberKind', 'member.medicalPlans', 'doctor')
+        $diagnosis = Diagnosis::with('member', 'member.memberKind', 'member.medicalPlans', 'doctor',
+            'doctor.doctorDepartment')
             ->where('member_id', $request->input('member_id'))
             ->orderByDesc('id')->get();
         return $this->respondWithData($diagnosis);
