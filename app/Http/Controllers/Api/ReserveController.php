@@ -257,7 +257,7 @@ class ReserveController extends Controller
             'diagnosis_id' => 'required|integer',
         ]);
         return $this->respondWithData(
-            DiagnosisOpearate::with('roleDoctor', 'diagnosis')
+            DiagnosisOpearate::with('roleDoctor', 'diagnosis', 'diagnosis.member')
                 ->where('diagnosis_id', $request->input('diagnosis_id'))->get()
         );
     }
