@@ -566,7 +566,7 @@ class MedicalController extends Controller
             'medical_plan_id' => 'integer',
         ]);
         return $this->respondWithData(
-            MedicalPlanOperate::with('roleDoctor', 'medicalPlan')
+            MedicalPlanOperate::with('roleDoctor', 'medicalPlan', 'medicalPlan.member')
                 ->when($request->input('medical_plan_id'), function (Builder $query, $value) {
                     $query->where('medical_plan_id', $value);
                 })->get()
