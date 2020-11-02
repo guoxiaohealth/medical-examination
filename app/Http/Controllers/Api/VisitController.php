@@ -128,7 +128,12 @@ class VisitController extends Controller
         Visit::updateOrCreate([
             'member_id' => $request->input('member_id'),
         ], array_filter($request->only([
-            'manager_id', 'status', 'cycle', 'day', 'first_visit', 'remarks'
+            'manager_id',
+            'status',
+            'cycle',
+            'day',
+            'first_visit',
+            'remarks'
         ])));
         return $this->respondWithSuccess();
     }
@@ -163,7 +168,7 @@ class VisitController extends Controller
             'member_id' => 'required|integer|exists:members,id',
         ]);
         return $this->respondWithData(
-            VisitDetails::with('manager')
+            VisitDetails::with('manager', 'visit')
                 ->where('member_id', $request->input('member_id'))->get()
         );
     }
