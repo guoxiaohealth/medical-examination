@@ -267,7 +267,9 @@ class ReserveController extends Controller
         $request->validate([
             'search' => 'string|nullable|max:255',
         ]);
-        $member = Member::with('memberKind', 'channel', 'diagnosis', 'diagnosis.doctor', 'medicalPlans')
+        $member = Member::with('memberKind', 'channel', 'diagnosis', 'diagnosis.doctor.doctorDepartment',
+            'diagnosis.doctor',
+            'medicalPlans')
             ->when($request->input('search'), function (Builder $query, $value) {
                 $query->whereRaw('CONCAT(name,mobile) LIKE ?', "%{$value}%");
             })->whereHas('diagnosis', function (Builder $query) {
