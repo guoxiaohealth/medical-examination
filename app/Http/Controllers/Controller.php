@@ -164,21 +164,37 @@ class Controller extends BaseController
                                 'id'                => $subject['id'],
                                 'config_project_id' => $project['id'],
                             ])->firstOrFail();
-                            return [
-                                'id'       => $subject['id'],
-                                'original' => optional($subject)['original'],
-                                'date'     => optional($subject)['date'],
-                                'merits'   => collect($subject['merits'])->map(function ($merit) use ($subject) {
-                                    ConfigMerit::where([
-                                        'id'                => $merit['id'],
+                            if (collect($subject['merits'])->isEmpty()) {
+                                return [
+                                    'id'       => $subject['id'],
+                                    'original' => optional($subject)['original'],
+                                    'date'     => optional($subject)['date'],
+                                    'merits'   => ConfigMerit::query()->where([
                                         'config_subject_id' => $subject['id'],
-                                    ])->firstOrFail();
-                                    return [
-                                        'id'    => $merit['id'],
-                                        'value' => optional($merit)['value'],
-                                    ];
-                                })
-                            ];
+                                    ])->pluck('id')->map(function ($id) {
+                                        return [
+                                            'id'    => $id,
+                                            'value' => null,
+                                        ];
+                                    }),
+                                ];
+                            } else {
+                                return [
+                                    'id'       => $subject['id'],
+                                    'original' => optional($subject)['original'],
+                                    'date'     => optional($subject)['date'],
+                                    'merits'   => collect($subject['merits'])->map(function ($merit) use ($subject) {
+                                        ConfigMerit::where([
+                                            'id'                => $merit['id'],
+                                            'config_subject_id' => $subject['id'],
+                                        ])->firstOrFail();
+                                        return [
+                                            'id'    => $merit['id'],
+                                            'value' => optional($merit)['value'],
+                                        ];
+                                    })
+                                ];
+                            }
                         })
                     ];
                 }),
