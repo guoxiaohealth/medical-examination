@@ -465,7 +465,8 @@ class MedicalController extends Controller
                 $query->where('times', $value);
             })->orderByDesc('id')->firstOrFail();
         //
-        $plan->kinds = $this->medicalPlanKinds($plan->kinds);
+        $plan->kinds      = $this->medicalPlanKinds($plan->kinds);
+        $plan->times_value = MedicalPlan::query()->where('member_id', $request->input('member_id'))->pluck('times');
         return $this->respondWithData($plan);
     }
 
