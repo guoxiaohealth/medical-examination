@@ -114,6 +114,9 @@ class Controller extends BaseController
 
     protected function meritAbnormal($merit)
     {
+        if (empty($merit)) {
+            return [];
+        }
         foreach ($merit['expression']['ex'] as $key => $ex) {
             $merit['expression']['ex'][$key]['status'] = $this->cmp($ex, $merit['value']);
         }
@@ -138,6 +141,8 @@ class Controller extends BaseController
                         $merit['id']    = $v['id'];
                         $merit['value'] = $v['value'];
                         return $this->meritAbnormal(is_null($merit) ? [] : $merit->toArray());
+                    })->filter(function ($v) {
+                        return !empty($v);
                     });
                     return $subject;
                 });
