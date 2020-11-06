@@ -137,10 +137,15 @@ class Controller extends BaseController
                     $subject->original = $v['original'];
                     $subject->date     = $v['date'];
                     $subject->merits   = collect($v['merits'])->map(function ($v) {
-                        $merit          = ConfigMerit::find($v['id']);
+                        $merit = ConfigMerit::find($v['id']);
+                        if (is_null($merit)) {
+                            $merit = [];
+                        } else {
+                            $merit = $merit->toArray();
+                        }
                         $merit['id']    = $v['id'];
                         $merit['value'] = $v['value'];
-                        return $this->meritAbnormal(is_null($merit) ? [] : $merit->toArray());
+                        return $this->meritAbnormal($merit);
                     })->filter(function ($v) {
                         return !empty($v);
                     });
