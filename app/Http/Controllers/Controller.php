@@ -117,6 +117,12 @@ class Controller extends BaseController
         if (empty($merit)) {
             return [];
         }
+        if (empty($merit['expression'])) {
+            return [];
+        }
+        if (empty($merit['expression']['ex'])) {
+            return [];
+        }
         foreach ($merit['expression']['ex'] as $key => $ex) {
             $merit['expression']['ex'][$key]['status'] = $this->cmp($ex, $merit['value']);
         }
