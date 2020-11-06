@@ -134,10 +134,10 @@ class Controller extends BaseController
                     $subject->original = $v['original'];
                     $subject->date     = $v['date'];
                     $subject->merits   = collect($v['merits'])->map(function ($v) {
-                        $merit          = ConfigMerit::find($v['id'])->toArray() ?? [];
+                        $merit          = ConfigMerit::find($v['id']);
                         $merit['id']    = $v['id'];
                         $merit['value'] = $v['value'];
-                        return $this->meritAbnormal($merit);
+                        return $this->meritAbnormal(is_null($merit) ? [] : $merit->toArray());
                     });
                     return $subject;
                 });
