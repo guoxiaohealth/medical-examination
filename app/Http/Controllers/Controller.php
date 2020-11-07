@@ -96,6 +96,9 @@ class Controller extends BaseController
 
     protected function meritsAbnormal($merit)
     {
+        if (empty($merit['ex'])) {
+            return [];
+        }
         $merit['ex'] = collect($merit['ex'])->map(function ($v) use ($merit) {
             $v['status'] = $this->cmp($v, $merit['value']);
             return $v;
@@ -109,6 +112,8 @@ class Controller extends BaseController
             $merit          = ConfigMerit::where('id', $v['id'])->value('expression');
             $merit['value'] = $v['value'];
             return $this->meritsAbnormal($merit);
+        })->filter(function ($v) {
+            return !empty($v);
         });
     }
 
