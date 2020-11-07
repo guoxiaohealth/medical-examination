@@ -218,7 +218,7 @@ class ReserveController extends Controller
             'doctor.doctorDepartment')
             ->where('id', $request->input('subscribe_id'))
             ->first();
-        if (!$subscribe) {
+        if (!is_null($subscribe)) {
             $medicalPlans = collect(optional($subscribe->member)->medicalPlans);
             //
             $subscribe->medical_plan_date = optional($medicalPlans->last())->updated_at;
@@ -228,9 +228,6 @@ class ReserveController extends Controller
             )->pluck('ex.*.status')->flatten(1)->filter(function ($v) {
                 return $v === false;
             })->count();
-        } else {
-            $subscribe->medical_plan_date            = null;
-            $subscribe->medical_plan_merits_abnormal = 0;
         }
         return $this->respondWithData($subscribe);
     }
