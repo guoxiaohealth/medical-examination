@@ -32,7 +32,7 @@ class AuthController extends Controller
         $builder = new CaptchaBuilder();
         $builder->build();
         $code = $builder->getPhrase();
-        Cache::put($code, $code, 120);
+        Cache::put(strtolower($code), strtolower($code), 120);
         return $this->respondWithData(
             $builder->inline()
         );
@@ -51,7 +51,7 @@ class AuthController extends Controller
             'password' => 'required|max:255',
             'captcha'  => 'required|max:255',
         ]);
-        if (!Cache::has($request->input('captcha'))) {
+        if (!Cache::has(strtolower($request->input('captcha')))) {
             throw new \Exception('无效的验证码', 401);
         }
         if (!$token = auth()->attempt($request->only(['account', 'password']))) {
