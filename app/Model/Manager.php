@@ -27,7 +27,6 @@ class Manager extends Model implements
     ];
 
     protected $hidden = [
-        'password',
     ];
 
     public function getJWTIdentifier()
