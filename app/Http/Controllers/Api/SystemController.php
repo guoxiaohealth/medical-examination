@@ -192,7 +192,7 @@ class SystemController extends Controller
         return $this->respondWithSuccess();
     }
 
-    const roleKind   = 1;
+    const roleKind = 1;
     const doctorKind = 2;
 
     /**
@@ -316,7 +316,8 @@ class SystemController extends Controller
                 $data['account'] = $request->input('account');
             }
             if ($request->has('password')) {
-                $data['password'] = Hash::make($request->input('password'));
+//                $data['password'] = Hash::make($request->input('password'));
+                $data['password'] = $request->input('password');
             }
             if ($request->has('status')) {
                 $data['status'] = $request->input('status');
@@ -431,7 +432,8 @@ class SystemController extends Controller
         ]);
         Manager::create([
             'account'        => $request->input('account'),
-            'password'       => Hash::make($request->input('password')),
+            //            'password'       => Hash::make($request->input('password')),
+            'password'       => $request->input('password'),
             'status'         => true,
             'name'           => $request->input('name'),
             'role_doctor_id' => $role->id,
@@ -452,12 +454,15 @@ class SystemController extends Controller
             'password'    => 'required|max:255',
             're_password' => 'required|max:255',
         ]);
-        if (!Hash::check($request->input('re_password'), $manager->password)) {
+//        if (!Hash::check($request->input('re_password'), $manager->password)) {
+//            throw new \Exception('password invalid');
+//        }
+        if ($request->input('re_password') != $manager->password) {
             throw new \Exception('password invalid');
         }
         $manager->update([
             'account'  => $request->input('account'),
-            'password' => Hash::make($request->input('password'))
+            'password' => $request->input('password')
         ]);
         return $this->respondWithSuccess();
     }
@@ -506,7 +511,7 @@ class SystemController extends Controller
         if (!$file->isValid()) {
             throw new \Exception('file is invalid');
         }
-        $file     = $request->file('file');
+        $file = $request->file('file');
         $filename = sprintf("%s.%s", uniqid('file-'), $file->getClientOriginalExtension());
         Storage::disk('public')->put($filename, file_get_contents($file->getRealPath()));
 

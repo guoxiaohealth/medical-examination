@@ -67,7 +67,7 @@ return [
 
     'providers' => [
         'users' => [
-            'driver' => 'eloquent',
+            'driver' => 'mw-eloquent',
             'model'  => App\Model\Manager::class,
         ],
 
