@@ -29,7 +29,7 @@ class AuthServiceProvider extends ServiceProvider
         //
 
         Auth::provider('mw-eloquent', function ($app, $config) {
-            return new \App\Libs\EloquentUserProvider($app['hash'], $config['model']);
+            return new \App\Lib\EloquentUserProvider($app['hash'], $config['model']);
         });
     }
 }
